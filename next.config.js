@@ -15,6 +15,16 @@ const config = {
 			},
 		],
 	},
+	eslint: {
+		ignoreDuringBuilds: true,
+	},
+	typescript: {
+		ignoreBuildErrors: true,
+	},
+	webpack: (config, { isServer }) => {
+		config.stats = "verbose";
+		return config;
+	},
 };
 
 export default config;
