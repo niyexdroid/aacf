@@ -25,6 +25,7 @@ const config = {
 		config.stats = "verbose";
 		return config;
 	},
+	output: "export"
 };
 
 export default config;
