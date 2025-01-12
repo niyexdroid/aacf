@@ -56,6 +56,7 @@ const config = {
     "import/no-named-as-default-member": "error",
     "react/no-unknown-property": "off",
     "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-empty-object-type": "off",
   },
   "env": {
     "browser": true,
