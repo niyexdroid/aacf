@@ -71,6 +71,9 @@ importers:
       postcss:
         specifier: ^8.4.39
         version: 8.4.49
+      postcss-syntax:
+        specifier: ^0.36.2
+        version: 0.36.2(postcss@8.4.49)
       prettier:
         specifier: ^3.3.2
         version: 3.4.2
@@ -92,6 +95,9 @@ importers:
       stylelint-config-standard:
         specifier: ^37.0.0
         version: 37.0.0(stylelint@16.13.0(typescript@5.7.2))
+      stylelint-config-tailwindcss:
+        specifier: ^0.0.7
+        version: 0.0.7(stylelint@16.13.0(typescript@5.7.2))(tailwindcss@3.4.16)
       tailwind-merge:
         specifier: ^2.5.5
         version: 2.5.5
@@ -2465,6 +2471,27 @@ packages:
     resolution: {integrity: sha512-9RbEr1Y7FFfptd/1eEdntyjMwLeghW1bHX9GWjXo19vx4ytPQhANltvVxDggzJl7mnWM+dX28kb6cyS/4iQjlQ==}
     engines: {node: '>=4'}
 
+  postcss-syntax@0.36.2:
+    resolution: {integrity: sha512-nBRg/i7E3SOHWxF3PpF5WnJM/jQ1YpY9000OaVXlAQj6Zp/kIqJxEDWIZ67tAd7NLuk7zqN4yqe9nc0oNAOs1w==}
+    peerDependencies:
+      postcss: '>=5.0.0'
+      postcss-html: '*'
+      postcss-jsx: '*'
+      postcss-less: '*'
+      postcss-markdown: '*'
+      postcss-scss: '*'
+    peerDependenciesMeta:
+      postcss-html:
+        optional: true
+      postcss-jsx:
+        optional: true
+      postcss-less:
+        optional: true
+      postcss-markdown:
+        optional: true
+      postcss-scss:
+        optional: true
+
   postcss-value-parser@4.2.0:
     resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}
 
@@ -2848,6 +2875,12 @@ packages:
     engines: {node: '>=18.12.0'}
     peerDependencies:
       stylelint: ^16.13.0
+
+  stylelint-config-tailwindcss@0.0.7:
+    resolution: {integrity: sha512-n2dCWH+0ppr0/by4EYCLWW7g5LU+l4UzUIsYS7xbVHqvm9UWa7UhltNdNiz5NmLF/FmbJR4Yd/v9DuUGvLw1Tg==}
+    peerDependencies:
+      stylelint: '>=13.13.1'
+      tailwindcss: '>=2.2.16'
 
   stylelint@16.13.0:
     resolution: {integrity: sha512-muxVjMhZB8BrDFSKNva0dmvD2tM0o/szrvuZuXYcAnN9a8nQmbGLqNUOemSgumaCMCPQ+0USYyG3hA5vJjUC1Q==}
@@ -5892,6 +5925,10 @@ snapshots:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
 
+  postcss-syntax@0.36.2(postcss@8.4.49):
+    dependencies:
+      postcss: 8.4.49
+
   postcss-value-parser@4.2.0: {}
 
   postcss@8.4.31:
@@ -6285,6 +6322,11 @@ snapshots:
     dependencies:
       stylelint: 16.13.0(typescript@5.7.2)
       stylelint-config-recommended: 15.0.0(stylelint@16.13.0(typescript@5.7.2))
+
+  stylelint-config-tailwindcss@0.0.7(stylelint@16.13.0(typescript@5.7.2))(tailwindcss@3.4.16):
+    dependencies:
+      stylelint: 16.13.0(typescript@5.7.2)
+      tailwindcss: 3.4.16
 
   stylelint@16.13.0(typescript@5.7.2):
     dependencies:
