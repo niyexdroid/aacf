@@ -3,6 +3,7 @@ import "@/styles/globals.css"
 
 import { GeistSans } from "geist/font/sans"
 import { type Metadata } from "next"
+import { Navbar } from "@/components/Navbar"
 
 export const metadata: Metadata = {
   title: "Hope Foundation | Making a Difference",
@@ -16,7 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body className="min-h-screen bg-background font-sans antialiased">
-        {children}
+        <Navbar />
+        <main className="pt-20">
+          {children}
+        </main>
       </body>
     </html>
   )
