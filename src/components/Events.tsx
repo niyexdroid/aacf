@@ -71,14 +71,21 @@ export function Events() {
                 <p className="mb-6 flex-1 text-gray-600">{event.description}</p>
                 
                 <Button 
-                  variant="outline"
-                  className="mt-auto w-full"
+                  className="mt-auto w-full bg-[#ff6b00] text-white hover:bg-[#ff6b00]/90"
                 >
                   Register Now
                 </Button>
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="mt-12 text-center">
+          <Button
+            className="bg-[#ff6b00] text-white hover:bg-[#ff6b00]/90"
+          >
+            View All Events
+          </Button>
         </div>
       </div>
     </section>
