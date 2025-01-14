@@ -1,23 +1,41 @@
-import { Heart, Users, Globe } from "lucide-react"
+import { Heart, Users, Globe, HandHeart, School, Sprout } from "lucide-react"
 
 const stats = [
   {
     icon: Users,
     value: "50K+",
     label: "Lives Impacted",
-    description: "People helped through our programs"
+    description: "People helped through our programs and initiatives worldwide"
   },
   {
     icon: Globe,
     value: "25+",
     label: "Countries Reached",
-    description: "Global impact across continents"
+    description: "Making a difference across continents through sustainable programs"
   },
   {
     icon: Heart,
     value: "1M+",
     label: "Donations Received",
-    description: "From generous supporters like you"
+    description: "Generous contributions from supporters enabling our mission"
+  },
+  {
+    icon: HandHeart,
+    value: "5K+",
+    label: "Active Volunteers",
+    description: "Dedicated individuals giving their time to make a difference"
+  },
+  {
+    icon: School,
+    value: "100+",
+    label: "Education Centers",
+    description: "Learning facilities providing quality education to communities"
+  },
+  {
+    icon: Sprout,
+    value: "200+",
+    label: "Community Projects",
+    description: "Sustainable initiatives creating lasting positive change"
   }
 ]
 
@@ -31,9 +49,9 @@ export function Impact() {
           {stats.map((stat, index) => (
             <div 
               key={index}
-              className="flex flex-col items-center rounded-lg bg-white p-8 text-center shadow-lg"
+              className="group flex cursor-pointer flex-col items-center rounded-lg bg-white p-8 text-center shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
             >
-              <stat.icon className="mb-4 h-12 w-12 text-primary" />
+              <stat.icon className="mb-4 h-12 w-12 text-primary transition-transform group-hover:scale-110" />
               <div className="mb-2 text-4xl font-bold text-primary">{stat.value}</div>
               <div className="mb-2 font-medium">{stat.label}</div>
               <p className="text-muted-foreground">{stat.description}</p>
