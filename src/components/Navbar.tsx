@@ -24,7 +24,7 @@ export function Navbar() {
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary">
           <Heart className="h-6 w-6 text-primary" />
-          <span>Hope Foundation</span>
+          <span>AAC Foundation</span>
         </Link>
 
         <nav className="flex items-center gap-8">

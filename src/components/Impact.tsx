@@ -51,7 +51,7 @@ export function Impact() {
               key={index}
               className="group flex cursor-pointer flex-col items-center rounded-lg bg-white p-8 text-center shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
             >
-              <stat.icon className="mb-4 h-12 w-12 text-primary transition-transform group-hover:scale-110" />
+              <stat.icon className="mb-4 h-12 w-12 text-[#ff6b00] transition-transform group-hover:scale-110" />
               <div className="mb-2 text-4xl font-bold text-primary">{stat.value}</div>
               <div className="mb-2 font-medium">{stat.label}</div>
               <p className="text-muted-foreground">{stat.description}</p>
