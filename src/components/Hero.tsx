@@ -22,7 +22,7 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="mb-6 text-5xl font-bold text-white">
+          <h1 className="mb-6 text-4xl font-bold text-white sm:text-5xl">
             Make a Difference Today
           </h1>
           <p className="mb-8 max-w-2xl text-lg text-white/90">

@@ -45,7 +45,7 @@ export function Impact() {
       <div className="container mx-auto px-4">
         <h2 className="mb-16 text-center text-3xl font-bold">Our Impact</h2>
         
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {stats.map((stat, index) => (
             <div 
               key={index}

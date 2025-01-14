@@ -24,10 +24,11 @@ export function Navbar() {
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary">
           <Heart className="h-6 w-6 text-primary" />
-          <span>AAC Foundation</span>
+          <span className="hidden sm:inline">AAC Foundation</span>
+          <span className="sm:hidden">AAC</span>
         </Link>
 
-        <nav className="flex items-center gap-8">
+        <nav className="hidden items-center gap-8 md:flex">
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -39,6 +40,10 @@ export function Navbar() {
           ))}
           <Button size="sm">Donate Now</Button>
         </nav>
+
+        <Button className="md:hidden" variant="outline" size="sm">
+          <Menu className="h-5 w-5" />
+        </Button>
       </div>
     </motion.header>
   )
