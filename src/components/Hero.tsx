@@ -28,12 +28,14 @@ export function Hero() {
           <p className="mb-8 max-w-2xl text-lg text-white/90">
             Join us in our mission to create positive change. Every contribution helps us build a better future for those in need.
           </p>
-          <Button size="lg" className="mr-4">
-            Donate Now
-          </Button>
-          <Button variant="secondary" size="lg">
-            Learn More
-          </Button>
+          <div className="flex flex-col gap-4 sm:flex-row">
+            <Button size="lg">
+              Donate Now
+            </Button>
+            <Button variant="secondary" size="lg">
+              Learn More
+            </Button>
+          </div>
         </motion.div>
       </div>
     </div>
