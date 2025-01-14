@@ -8,7 +8,7 @@ import { Button } from "./ui/Button"
 const navItems = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
-  { label: "Programs", href: "/programs" },
+  { label: "Events", href: "/events" },
   { label: "Impact", href: "/impact" },
   { label: "Contact", href: "/contact" },
 ]
