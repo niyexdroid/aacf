@@ -55,15 +55,15 @@ export function Footer() {
             <ul className="space-y-3 text-gray-400">
               <li className="flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-[#ff6b00]" />
-                123 Charity Street, City, Country
+                Plot 53 Block 99 Flat 1, Iba Housing Estate, Iba -Ojo, Lagos
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-5 w-5 text-[#ff6b00]" />
-                +1 234 567 890
+                +2348168819022
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-5 w-5 text-[#ff6b00]" />
-                info@aacfoundation.org
+                abosedeainacharityfoundation@gmail.com
               </li>
             </ul>
           </div>
