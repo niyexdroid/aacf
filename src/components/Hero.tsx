@@ -1,20 +1,44 @@
 "use client"
 
 import { Button } from "@/components/ui/Button"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
+import { useEffect, useState } from "react"
+
+const images = [
+  "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2940&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1509099836639-18ba1795216d?q=80&w=3431&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=3270&auto=format&fit=crop"
+]
 
 export function Hero() {
+  const [currentImage, setCurrentImage] = useState(0)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % images.length)
+    }, 3000)
+
+    return () => clearInterval(timer)
+  }, [])
+
   return (
     <div className="relative h-[80vh] overflow-hidden">
-      <div 
-        className="absolute inset-0 z-0" 
-        style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2940&auto=format&fit=crop)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          filter: 'brightness(0.7)'
-        }}
-      />
+      <AnimatePresence mode="wait">
+        <motion.div 
+          key={currentImage}
+          className="absolute inset-0 z-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1 }}
+          style={{
+            backgroundImage: `url(${images[currentImage]})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'brightness(0.7)'
+          }}
+        />
+      </AnimatePresence>
       
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
         <motion.div
