@@ -67,7 +67,7 @@ export function Hero() {
             <Button size="lg" className="bg-[#ff6b00] text-white hover:bg-[#ff6b00]/90">
               Donate Now
             </Button>
-            <Button variant="secondary" size="lg" className="bg-black text-[#ff6b00] hover:bg-black/90">
+            <Button variant="secondary" size="lg" className="bg-white text-[#ff6b00] hover:bg-white/90">
               Learn More
             </Button>
           </div>

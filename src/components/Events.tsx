@@ -40,7 +40,7 @@ export function Events() {
           {events.map((event, index) => (
             <div 
               key={index}
-              className="group flex h-full flex-col overflow-hidden rounded-lg bg-black/90 text-white shadow-lg transition-all hover:shadow-xl"
+              className="group flex h-full flex-col overflow-hidden rounded-lg bg-white shadow-lg transition-all hover:shadow-xl"
             >
               <div className="relative h-48 overflow-hidden">
                 <img 
@@ -51,9 +51,9 @@ export function Events() {
               </div>
               
               <div className="flex flex-1 flex-col p-6">
-                <h3 className="mb-4 text-xl font-semibold text-gray-900">{event.title}</h3>
+                <h3 className="mb-4 text-xl font-semibold">{event.title}</h3>
                 
-                <div className="mb-4 space-y-2 text-gray-600">
+                <div className="mb-4 space-y-2">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-orange-500" />
                     <span>{event.date}</span>
