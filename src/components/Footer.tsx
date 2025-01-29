@@ -62,8 +62,8 @@ export function Footer() {
                 +2348168819022
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="h-5 w-5 text-[#ff6b00]" />
-                abosedeainacharityfoundation@gmail.com
+                <Mail className="h-5 w-5 shrink-0 text-[#ff6b00]" />
+                <span className="text-sm">abosedeainacharityfoundation@gmail.com</span>
               </li>
             </ul>
           </div>
