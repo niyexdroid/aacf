@@ -38,7 +38,7 @@ export function Navbar() {
               {item.label}
             </Link>
           ))}
-          <Button size="sm">Donate Now</Button>
+          <Button size="sm" className="bg-[#ff6b00] text-white hover:bg-[#ff6b00]/90">Donate Now</Button>
         </nav>
 
         <Button className="md:hidden" variant="outline" size="sm">
