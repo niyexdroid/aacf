@@ -54,7 +54,7 @@ export function Footer() {
             <h3 className="mb-6 text-lg font-semibold">Contact Info</h3>
             <ul className="space-y-3 text-gray-400">
               <li className="flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-[#ff6b00]" />
+                <MapPin className="h-6 w-6 text-[#ff6b00]" />
                 Plot 53 Block 99 Flat 1, Iba Housing Estate, Iba -Ojo, Lagos
               </li>
               <li className="flex items-center gap-2">
