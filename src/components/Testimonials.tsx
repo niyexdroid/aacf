@@ -75,15 +75,15 @@ export function Testimonials() {
             >
               <Quote className="mb-6 h-12 w-12 text-[#ff6b00]" />
               <p className="mb-8 text-xl italic text-gray-700">
-                "{testimonials[current].quote}"
+                "{testimonials[current]?.quote}"
               </p>
               <img 
-                src={testimonials[current].image} 
-                alt={testimonials[current].author}
+                src={testimonials[current]?.image} 
+                alt={testimonials[current]?.author || 'Testimonial author'}
                 className="mb-4 h-16 w-16 rounded-full object-cover"
               />
-              <div className="font-semibold">{testimonials[current].author}</div>
-              <div className="text-sm text-gray-500">{testimonials[current].role}</div>
+              <div className="font-semibold">{testimonials[current]?.author}</div>
+              <div className="text-sm text-gray-500">{testimonials[current]?.role}</div>
             </motion.div>
           </div>
 
