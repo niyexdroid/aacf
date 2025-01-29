@@ -39,6 +39,17 @@ export function Hero() {
           }}
         />
       </AnimatePresence>
+
+      <div className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+        {images.map((_, index) => (
+          <div
+            key={index}
+            className={`h-2 w-2 rounded-full transition-all ${
+              index === currentImage ? 'bg-[#ff6b00] w-6' : 'bg-white/50'
+            }`}
+          />
+        ))}
+      </div>
       
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
         <motion.div
