@@ -22,10 +22,12 @@ export function Navbar() {
       transition={{ duration: 0.5 }}
     >
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary">
-          <Heart className="h-6 w-6 text-primary" />
-          <span className="hidden sm:inline">AAC Foundation</span>
-          <span className="sm:hidden">AAC</span>
+        <Link href="/" className="flex items-center gap-2">
+          <img 
+            src="/logo.png" 
+            alt="Abosede Aina Foundation" 
+            className="h-12 w-auto"
+          />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
