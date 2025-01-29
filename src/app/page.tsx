@@ -1,6 +1,7 @@
 import { Hero } from "@/components/Hero"
 import { Impact } from "@/components/Impact"
 import { Events } from "@/components/Events"
+import { Volunteer } from "@/components/Volunteer"
 
 export default function HomePage() {
   return (
@@ -8,6 +9,7 @@ export default function HomePage() {
       <Hero />
       <Impact />
       <Events />
+      <Volunteer />
     </>
   )
 }
