@@ -40,7 +40,7 @@ export function Events() {
           {events.map((event, index) => (
             <div 
               key={index}
-              className="group flex h-full flex-col overflow-hidden rounded-lg bg-white shadow-lg transition-all hover:shadow-xl"
+              className="group flex h-full flex-col overflow-hidden rounded-lg bg-black/90 text-white shadow-lg transition-all hover:shadow-xl"
             >
               <div className="relative h-48 overflow-hidden">
                 <img 

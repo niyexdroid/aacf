@@ -63,11 +63,11 @@ export function Hero() {
           <p className="mb-8 max-w-2xl text-lg text-white/90">
             Join us in our mission to create positive change. Every contribution helps us build a better future for those in need.
           </p>
-          <div className="flex flex-col items-center gap-4 sm:flex-row">
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button size="lg" className="bg-[#ff6b00] text-white hover:bg-[#ff6b00]/90">
               Donate Now
             </Button>
-            <Button variant="secondary" size="lg" className="bg-white text-[#ff6b00] hover:bg-white/90">
+            <Button variant="secondary" size="lg" className="bg-black text-[#ff6b00] hover:bg-black/90">
               Learn More
             </Button>
           </div>
