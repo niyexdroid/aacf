@@ -15,7 +15,6 @@ const config = {
     typescript: {
         ignoreBuildErrors: true,
     },
-    missingSuspenseWithCSRBailout: false,
     webpack: (config, { isServer }) => {
         config.stats = "verbose";
         return config;
