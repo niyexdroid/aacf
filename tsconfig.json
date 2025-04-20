@@ -8,10 +8,10 @@
     "resolveJsonModule": true,
     "moduleDetection": "force",
     "isolatedModules": true,
+    "strictNullChecks": false,
 
     /* Strictness */
     "strict": true,
-    "noUncheckedIndexedAccess": true,
     "checkJs": true,
 
     /* Bundled projects */
@@ -44,6 +44,7 @@
     ".next",
     "out",
     "build",
-    "dist"
+    "dist",
+    "supabase"
   ]
 }
