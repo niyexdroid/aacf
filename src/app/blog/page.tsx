@@ -4,45 +4,19 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase"; // Adjust the path based on your project structure
 import { motion } from "framer-motion";
 import { Calendar } from "lucide-react";
-import { Button } from "./ui/Button";
-import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 
-// const blogPosts = [
-//   {
-//     title: "Making a Difference: Our Journey in 2023",
-//     date: "January 15, 2024",
-//     excerpt: "Looking back at the incredible impact we've made together in communities across the globe.",
-//     image: "https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?q=80&w=3270&auto=format&fit=crop",
-//     category: "Impact Stories"
-//   },
-//   {
-//     title: "Volunteer Stories: Meet Sarah from Kenya",
-//     date: "January 10, 2024",
-//     excerpt: "Discover how one volunteer's dedication is transforming lives in rural communities.",
-//     image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2940&auto=format&fit=crop",
-//     category: "Volunteer Spotlight"
-//   },
-//   {
-//     title: "Building Schools: A Path to Better Future",
-//     date: "January 5, 2024",
-//     excerpt: "How our education initiatives are creating lasting change in developing regions.",
-//     image: "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?q=80&w=3270&auto=format&fit=crop",
-//     category: "Projects"
-//   }
-// ]
-
-export function Blog() {
+export default function BlogPage() {
   const [blogs, setBlogs] = useState([]);
-
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
         const querysnapshot = await getDocs(collection(db, "blogs"));
-        const blogsData = querysnapshot.docs.map((doc) => ({
+        const blogData = querysnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setBlogs(blogsData);
+        setBlogs(blogData);
       } catch (error) {
         console.error("Error fetching blogs:", error);
       }
@@ -101,13 +75,11 @@ export function Blog() {
           ))}
         </div>
 
-        <div className="mt-12 text-center">
-          <Link href="/blog">
-            <Button className="bg-[#ff6b00] text-white hover:bg-[#ff6b00]/90">
-              View All Posts
-            </Button>
-          </Link>
-        </div>
+        {/* <div className="mt-12 text-center">
+          <Button className="bg-[#ff6b00] text-white hover:bg-[#ff6b00]/90">
+            View All Posts
+          </Button>
+        </div> */}
       </div>
     </section>
   );

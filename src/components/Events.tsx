@@ -2,52 +2,32 @@
 
 import { Calendar, Clock, MapPin } from "lucide-react";
 import { Button } from "./ui/Button";
+import Link from "next/link";
 
-const events = [
-  {
-    title: "Annual Charity Gala",
-    date: "March 15, 2024",
-    time: "6:00 PM",
-    location: "Grand Ballroom, Ritz Carlton",
-    description:
-      "Join us for an elegant evening of fine dining and entertainment to support our global education initiatives. All proceeds go directly to building schools in developing nations.",
-    image:
-      "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=3269&auto=format&fit=crop",
-  },
-  {
-    title: "Community Outreach Day",
-    date: "April 2, 2024",
-    time: "9:00 AM",
-    location: "Central Community Center",
-    description:
-      "A day dedicated to local community service. Volunteers will participate in various activities including food distribution, health checkups, and youth mentoring programs.",
-    image:
-      "https://images.unsplash.com/photo-1559027615-cd4628902d4a?q=80&w=3270&auto=format&fit=crop",
-  },
-  {
-    title: "Fundraising Marathon",
-    date: "May 20, 2024",
-    time: "7:30 AM",
-    location: "City Park",
-    description:
-      "Run for a cause! Join our annual marathon to raise funds for children's healthcare. Choose between 5K, 10K, or full marathon distances.",
-    image:
-      "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?q=80&w=3270&auto=format&fit=crop",
-  },
-];
-
-export function Events() {
+export function Events({
+  events = [],
+  showViewAllButton = true, // Default to true
+  showDescription = true, // Default to true
+  showHeader = true, // Default to true
+}: {
+  events: any[];
+  showViewAllButton?: boolean;
+  showDescription?: boolean;
+  showHeader?: boolean;
+}) {
   return (
     <section className="bg-white py-24">
       <div className="container mx-auto px-4">
-        <h2 className="mb-16 text-center text-3xl font-bold">
-          Upcoming Events
-        </h2>
+        {showHeader && (
+          <h2 className="mb-16 text-center text-3xl font-bold">
+            Upcoming Events
+          </h2>
+        )}
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {events.map((event, index) => (
+          {events.map((event) => (
             <div
-              key={index}
+              key={event.id}
               className="group flex h-full flex-col overflow-hidden rounded-lg bg-white shadow-lg transition-all hover:shadow-xl"
             >
               <div className="relative h-48 overflow-hidden">
@@ -76,21 +56,27 @@ export function Events() {
                   </div>
                 </div>
 
-                <p className="mb-6 flex-1 text-gray-600">{event.description}</p>
-
-                <Button className="mt-auto w-full bg-[#ff6b00] text-white hover:bg-[#ff6b00]/90">
-                  Register Now
-                </Button>
+                {/* Conditionally render the description */}
+                {showDescription && (
+                  <p className="mb-6 flex-1 text-gray-600">
+                    {event.description}
+                  </p>
+                )}
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-12 text-center">
-          <Button className="bg-[#ff6b00] text-white hover:bg-[#ff6b00]/90">
-            View All Events
-          </Button>
-        </div>
+        {/* Conditionally render the "View All Events" button */}
+        {showViewAllButton && (
+          <div className="mt-12 text-center">
+            <Link href="/events">
+              <Button className="bg-[#ff6b00] text-white hover:bg-[#ff6b00]/90">
+                View All Events
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );
