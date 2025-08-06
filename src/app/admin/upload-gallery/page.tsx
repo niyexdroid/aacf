@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { storage, db } from "@/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
@@ -37,7 +37,7 @@ export default function UploadGalleryPage() {
   const router = useRouter();
 
   // Fetch events for dropdown
-  useState(() => {
+  useEffect(() => {
     const fetchEvents = async () => {
       try {
         const response = await fetch("/api/events");
@@ -48,7 +48,7 @@ export default function UploadGalleryPage() {
       }
     };
     fetchEvents();
-  });
+  }, []);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
