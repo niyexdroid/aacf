@@ -1,21 +1,25 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Menu } from "lucide-react";
+import { Menu, Heart } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/Button";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 const navItems = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
   { label: "Events", href: "/events" },
-  { label: "Impact", href: "/impact" },
   { label: "Contact", href: "/contact" },
+  { label: "Gallery", href: "/gallery" },
+  { label: "Blog", href: "/blog" },
 ];
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname(); // Get the current path
+
   return (
     <motion.header
       className="fixed left-0 right-0 top-0 z-50 bg-white/80 backdrop-blur-md"
@@ -37,17 +41,27 @@ export function Navbar() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                (item.href === "/" && pathname === "/") || // Special case for Home
+                (item.href !== "/" && pathname.startsWith(item.href)) // For other links
+                  ? "border-b-2 border-[#ff6b00] text-primary"
+                  : "text-muted-foreground"
+              }`}
             >
               {item.label}
             </Link>
           ))}
-          <Button
-            size="sm"
-            className="bg-[#ff6b00] text-white hover:bg-[#ff6b00]/90"
-          >
-            Donate Now
-          </Button>
+          <Link href="/donate">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                size="sm"
+                className="flex items-center gap-2 bg-[#ff6b00] text-white shadow-lg transition-all duration-300 hover:bg-[#ff6b00]/90 hover:shadow-xl"
+              >
+                <Heart className="h-4 w-4" />
+                Donate Now
+              </Button>
+            </motion.div>
+          </Link>
         </nav>
         <Button
           className="md:hidden"
@@ -64,17 +78,30 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="block px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                className={`block px-4 py-2 text-sm font-medium transition-colors hover:text-primary ${
+                  (item.href === "/" && pathname === "/") || // Special case for Home
+                  (item.href !== "/" && pathname.startsWith(item.href)) // For other links
+                    ? "w-fit border-b-2 border-[#ff6b00] text-primary" // Add w-fit for mobile
+                    : "text-muted-foreground"
+                }`}
               >
                 {item.label}
               </Link>
             ))}
-            <Button
-              size="sm"
-              className="m-4 bg-[#ff6b00] text-white hover:bg-[#ff6b00]/90"
-            >
-              Donate Now
-            </Button>
+            <Link href="/donate">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  size="sm"
+                  className="m-4 flex items-center gap-2 bg-[#ff6b00] text-white shadow-lg transition-all duration-300 hover:bg-[#ff6b00]/90 hover:shadow-xl"
+                >
+                  <Heart className="h-4 w-4" />
+                  Donate Now
+                </Button>
+              </motion.div>
+            </Link>
           </nav>
         )}
       </div>

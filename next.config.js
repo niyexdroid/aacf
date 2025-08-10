@@ -1,4 +1,6 @@
-/** @type {import("next").NextConfig} */
+/**
+ * @type {import('next').NextConfig}
+ */
 const config = {
   trailingSlash: true,
   images: {
@@ -11,6 +13,7 @@ const config = {
       },
     ],
   },
+
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -20,40 +23,14 @@ const config = {
   watchOptions: {
     pollIntervalMs: 10000,
   },
+
+  reactStrictMode: false,
+
   webpack: (config, { isServer }) => {
-    config.stats = "verbose";
-    if (!isServer) {
-      config.devtool = "source-map";
-      config.resolve.fallback = {
-        fs: false,
-        path: false,
-        os: false,
-        crypto: false,
-      };
-
-      // Inject build error detector
-      // This approach ensures the detector is included in the client bundle
-      const originalEntry = config.entry;
-      config.entry = async () => {
-        const entries = await originalEntry();
-
-        // Add our build error detector to all client entries
-        if (entries['main.js']) {
-          if (Array.isArray(entries['main.js'])) {
-            entries['main.js'].push('./src/utils/build-error-detector.ts');
-            entries['main.js'].push('./src/utils/global-error-handler.tsx');
-          } else {
-            entries['main.js'] = [
-              entries['main.js'],
-              './src/utils/build-error-detector.ts',
-              './src/utils/global-error-handler.tsx'
-            ];
-          }
-        }
-
-        return entries;
-      };
-    }
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@": "./src",
+    };
     return config;
   },
 };
