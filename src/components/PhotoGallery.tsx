@@ -5,11 +5,8 @@ import Image from "next/image";
 interface GalleryImage {
   id: string;
   url: string;
-  title: string;
   caption?: string;
-  date?: string;
-  eventId?: string;
-  timestamp?: any;
+  title?: string;
 }
 
 interface PhotoGalleryProps {
@@ -55,9 +52,6 @@ export function PhotoGallery({
               <h3 className="mb-1 font-semibold text-gray-900">
                 {image.title}
               </h3>
-              {image.date && (
-                <p className="mb-2 text-sm text-gray-500">{image.date}</p>
-              )}
               {image.caption && (
                 <p className="line-clamp-2 text-sm text-gray-600">
                   {image.caption}
@@ -105,9 +99,6 @@ export function PhotoGallery({
               <h3 className="mb-2 text-2xl font-bold">{selectedImage.title}</h3>
               {eventTitle && (
                 <p className="mb-2 text-lg opacity-90">{eventTitle}</p>
-              )}
-              {selectedImage.date && (
-                <p className="mb-2 text-sm opacity-75">{selectedImage.date}</p>
               )}
               {selectedImage.caption && (
                 <p className="text-sm leading-relaxed opacity-90">

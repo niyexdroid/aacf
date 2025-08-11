@@ -1,9 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { storage, db } from "@/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -14,6 +11,7 @@ import {
   FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { getEvents } from "@/actions/getEvents";
 
 interface VideoData {
   title: string;
@@ -39,13 +37,8 @@ export default function UploadVideosPage() {
   // Fetch events for dropdown
   useEffect(() => {
     const fetchEvents = async () => {
-      try {
-        const response = await fetch("/api/events");
-        const data = await response.json();
-        setEvents(data);
-      } catch (error) {
-        console.error("Error fetching events:", error);
-      }
+      const eventsData = await getEvents();
+      setEvents(eventsData);
     };
     fetchEvents();
   }, []);
@@ -61,34 +54,31 @@ export default function UploadVideosPage() {
       return;
     }
 
-    if (!videoData.title.trim()) {
-      alert("Please enter a title for the videos.");
-      return;
-    }
-
     setUploading(true);
-    setUploadProgress(0);
 
     try {
-      const uploadPromises = files.map(async (file, index) => {
-        const storageRef = ref(storage, `videos/${Date.now()}_${file.name}`);
-        await uploadBytes(storageRef, file);
-        const downloadURL = await getDownloadURL(storageRef);
-
-        // Add to Firestore
-        await addDoc(collection(db, "videos"), {
-          videoUrl: downloadURL,
-          title: videoData.title + (files.length > 1 ? ` (${index + 1})` : ""),
-          description: videoData.description,
-          date: videoData.date,
-          eventId: videoData.eventId || null,
-          timestamp: serverTimestamp(),
+      for (const file of files) {
+        const response = await fetch(`/api/upload?filename=${file.name}`, {
+          method: "POST",
+          body: file,
         });
 
-        setUploadProgress(((index + 1) / files.length) * 100);
-      });
+        const newBlob = await response.json();
 
-      await Promise.all(uploadPromises);
+        // Now, save the blob URL to your database
+        await fetch("/api/videos", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            url: newBlob.url,
+            title: videoData.title,
+            description: videoData.description,
+            eventId: videoData.eventId,
+          }),
+        });
+      }
 
       // Reset form
       setFiles([]);
@@ -103,6 +93,7 @@ export default function UploadVideosPage() {
       }
 
       alert("Videos uploaded successfully!");
+      router.push("/admin/manage-videos");
     } catch (error) {
       console.error("Error uploading videos:", error);
       alert("Error uploading videos. Please try again.");
