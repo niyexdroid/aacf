@@ -1,25 +1,14 @@
-"use client";
-
 import { Hero } from "@/components/Hero";
 import { Impact } from "@/components/Impact";
 import { Events } from "@/components/Events";
 import { Volunteer } from "@/components/Volunteer";
-import { Blog } from "@/components/Blog";
 import { Testimonials } from "@/components/Testimonials";
-import { useEffect, useState } from "react";
-import { fetchEvents } from "@/utils/fetchEvents";
+import { Blog } from "@/components/Blog";
+import { prisma } from "@/lib/prisma";
 
-export default function HomePage() {
-  const [events, setEvents] = useState([]);
-
-  useEffect(() => {
-    const getEvents = async () => {
-      const eventsData = await fetchEvents();
-      setEvents(eventsData);
-    };
-
-    getEvents();
-  }, []);
+export default async function HomePage() {
+  const events = await getEvents();
+  const blogs = await getBlogs();
 
   return (
     <>
@@ -28,7 +17,27 @@ export default function HomePage() {
       <Events events={events} />
       <Volunteer />
       <Testimonials />
-      <Blog />
+      <Blog blogs={blogs} />
     </>
   );
+}
+
+async function getEvents() {
+  try {
+    const events = await prisma.event.findMany();
+    return events;
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    return [];
+  }
+}
+
+async function getBlogs() {
+  try {
+    const blogs = await prisma.blog.findMany();
+    return blogs;
+  } catch (error) {
+    console.error("Error fetching blogs:", error);
+    return [];
+  }
 }

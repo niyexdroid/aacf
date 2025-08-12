@@ -1,21 +1,9 @@
-"use client";
-
 import { Events } from "@/components/Events";
-import { useEffect, useState } from "react";
-import { fetchEvents } from "@/utils/fetchEvents";
+import { getEvents } from "@/actions/getEvents";
 import { Button } from "@/components/ui/Button";
 
-export default function EventPage() {
-  const [events, setEvents] = useState([]);
-
-  useEffect(() => {
-    const getEvents = async () => {
-      const eventsData = await fetchEvents();
-      setEvents(eventsData);
-    };
-
-    getEvents();
-  }, []);
+export default async function EventPage() {
+  const events = await getEvents();
 
   return (
     <div>

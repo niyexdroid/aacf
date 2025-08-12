@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { auth } from "@/firebase";
-import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { Loader2, Shield, Upload, FileText, Image, Video } from "lucide-react";
 
@@ -12,25 +10,19 @@ export default function AdminPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-      } else {
-        router.push("/admin/login");
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
+    // onAuthStateChanged(auth, (user) => {
+    //   if (user) {
+    //     setUser(user);
+    //   } else {
+    //     router.push("/admin/login");
+    //   }
+    // });
   }, [router]);
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      router.push("/admin/login");
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
+  const handleLogout = () => {
+    // signOut(auth).then(() => {
+    //   router.push("/admin/login");
+    // });
   };
 
   if (loading) {

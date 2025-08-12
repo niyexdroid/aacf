@@ -1,9 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { storage, db } from "@/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -14,6 +11,7 @@ import {
   FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { getEvents } from "@/actions/getEvents";
 
 interface GalleryImage {
   title: string;
@@ -39,13 +37,8 @@ export default function UploadGalleryPage() {
   // Fetch events for dropdown
   useEffect(() => {
     const fetchEvents = async () => {
-      try {
-        const response = await fetch("/api/events");
-        const data = await response.json();
-        setEvents(data);
-      } catch (error) {
-        console.error("Error fetching events:", error);
-      }
+      const eventsData = await getEvents();
+      setEvents(eventsData);
     };
     fetchEvents();
   }, []);
@@ -61,55 +54,38 @@ export default function UploadGalleryPage() {
       return;
     }
 
-    if (!imageData.title.trim()) {
-      alert("Please enter a title for the images.");
-      return;
-    }
-
     setUploading(true);
-    setUploadProgress(0);
 
-    try {
-      const uploadPromises = files.map(async (file, index) => {
-        const storageRef = ref(storage, `gallery/${Date.now()}_${file.name}`);
-        await uploadBytes(storageRef, file);
-        const downloadURL = await getDownloadURL(storageRef);
-
-        // Add to Firestore
-        await addDoc(collection(db, "gallery"), {
-          imageUrl: downloadURL,
-          title: imageData.title + (files.length > 1 ? ` (${index + 1})` : ""),
-          caption: imageData.caption,
-          date: imageData.date,
-          eventId: imageData.eventId || null,
-          timestamp: serverTimestamp(),
+    for (const file of files) {
+      try {
+        const response = await fetch(`/api/upload?filename=${file.name}`, {
+          method: "POST",
+          body: file,
         });
 
-        setUploadProgress(((index + 1) / files.length) * 100);
-      });
+        const newBlob = await response.json();
 
-      await Promise.all(uploadPromises);
-
-      // Reset form
-      setFiles([]);
-      setImageData({
-        title: "",
-        caption: "",
-        date: new Date().toISOString().split("T")[0],
-        eventId: "",
-      });
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+        // Now, save the blob URL to your database
+        await fetch("/api/gallery", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            url: newBlob.url,
+            caption: imageData.caption,
+            title: imageData.title,
+            eventId: imageData.eventId,
+          }),
+        });
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        alert(`Error uploading file: ${file.name}`);
       }
-
-      alert("Images uploaded successfully!");
-    } catch (error) {
-      console.error("Error uploading images:", error);
-      alert("Error uploading images. Please try again.");
-    } finally {
-      setUploading(false);
-      setUploadProgress(0);
     }
+
+    setUploading(false);
+    router.push("/admin/manage-gallery");
   };
 
   return (

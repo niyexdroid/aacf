@@ -46,3 +46,9 @@ yarn-error.log*
 # idea files
 .idea
 .aider*
+
+.firebase
+
+.vercel
+
+/generated/prisma

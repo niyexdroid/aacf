@@ -7,22 +7,16 @@ import Link from "next/link";
 export function Events({
   events = [],
   showViewAllButton = true, // Default to true
-  showDescription = true, // Default to true
-  showHeader = true, // Default to true
 }: {
   events: any[];
   showViewAllButton?: boolean;
-  showDescription?: boolean;
-  showHeader?: boolean;
 }) {
   return (
     <section className="bg-white py-24">
       <div className="container mx-auto px-4">
-        {showHeader && (
-          <h2 className="mb-16 text-center text-3xl font-bold">
-            Upcoming Events
-          </h2>
-        )}
+        <h2 className="mb-16 text-center text-3xl font-bold">
+          Upcoming Events
+        </h2>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {events.map((event) => (
@@ -44,7 +38,7 @@ export function Events({
                 <div className="mb-4 space-y-2">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-orange-500" />
-                    <span>{event.date}</span>
+                    <span>{new Date(event.date).toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-orange-500" />
@@ -56,12 +50,7 @@ export function Events({
                   </div>
                 </div>
 
-                {/* Conditionally render the description */}
-                {showDescription && (
-                  <p className="mb-6 flex-1 text-gray-600">
-                    {event.description}
-                  </p>
-                )}
+                <p className="mb-6 flex-1 text-gray-600">{event.description}</p>
               </div>
             </div>
           ))}

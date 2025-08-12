@@ -25,13 +25,5 @@ const config = {
   },
 
   reactStrictMode: false,
-
-  webpack: (config, { isServer }) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      "@": "./src",
-    };
-    return config;
-  },
 };
 export default config;

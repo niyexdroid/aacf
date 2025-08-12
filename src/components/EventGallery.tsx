@@ -24,12 +24,6 @@ export function EventGallery({ event, onClose }: EventGalleryProps) {
             <h2 className="mb-2 text-3xl font-bold text-white">
               {event.title}
             </h2>
-            <div className="text-white/80">
-              <p className="flex items-center">
-                📅 {new Date(event.date).toLocaleDateString()}
-              </p>
-              <p className="flex items-center">📍 {event.location}</p>
-            </div>
           </div>
           <button
             onClick={onClose}
