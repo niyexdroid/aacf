@@ -2,12 +2,19 @@ import ContactForm from "@/components/ContactForm";
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 via-blue-700 to-green-600 py-20 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="mb-6 text-5xl font-bold">Contact Us</h1>
-          <p className="mx-auto max-w-2xl text-xl">
+      <section className="relative py-20 text-white">
+        {/* Background Image */}
+        <div className="hero-contact-bg absolute inset-0" />
+
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-900/60 via-orange-800/50 to-red-800/60" />
+
+        {/* Content */}
+        <div className="container relative mx-auto px-4 text-center">
+          <h1 className="mb-6 text-5xl font-bold drop-shadow-lg">Contact Us</h1>
+          <p className="mx-auto max-w-2xl text-xl drop-shadow-md">
             Get in touch with us. We'd love to hear from you and help make a
             difference together.
           </p>

@@ -11,7 +11,27 @@ export const metadata: Metadata = {
   title: "AAC Foundation | Making a Difference",
   description:
     "Join us in our mission to create positive change and help those in need through sustainable charitable initiatives.",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  manifest: "/site.webmanifest",
+  metadataBase: new URL("https://aacfoundation.org"),
+  icons: {
+    icon: "/Logo.jpg",
+    apple: "/Logo.jpg",
+    shortcut: "/Logo.jpg",
+  },
+  openGraph: {
+    title: "AAC Foundation | Making a Difference",
+    description:
+      "Join us in our mission to create positive change and help those in need through sustainable charitable initiatives.",
+    images: ["/Logo.jpg"],
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "AAC Foundation | Making a Difference",
+    description:
+      "Join us in our mission to create positive change and help those in need through sustainable charitable initiatives.",
+    images: ["/Logo.jpg"],
+  },
 };
 
 export default function RootLayout({
@@ -22,6 +42,12 @@ export default function RootLayout({
   // Client-only hook usage guard: wrap toast container in a client component shim
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
+      <head>
+        <meta name="theme-color" content="#ea580c" />
+        <meta name="msapplication-TileColor" content="#ea580c" />
+        <meta name="msapplication-TileImage" content="/Logo.jpg" />
+        <link rel="mask-icon" href="/Logo.jpg" color="#ea580c" />
+      </head>
       <body className="min-h-screen bg-background font-sans antialiased">
         <Navbar />
         <main className="pt-20">{children}</main>

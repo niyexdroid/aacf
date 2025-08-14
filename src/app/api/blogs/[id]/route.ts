@@ -6,16 +6,18 @@ export const dynamic = "force-dynamic";
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getSession();
     if (!session)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { id } = await params;
     const body = await req.json();
     const { title, excerpt, content, category, image } = body;
     const blog = await prisma.blog.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(title !== undefined && { title }),
         ...(excerpt !== undefined && { excerpt }),
@@ -36,13 +38,15 @@ export async function PATCH(
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getSession();
     if (!session)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    await prisma.blog.delete({ where: { id: params.id } });
+
+    const { id } = await params;
+    await prisma.blog.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (e) {
     console.error("DELETE /api/blogs/[id] error", e);

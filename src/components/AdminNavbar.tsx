@@ -26,7 +26,7 @@ const navItems: NavItem[] = [
   },
   { href: "/admin/upload-gallery", label: "Gallery", icon: Image },
   { href: "/admin/upload-videos", label: "Videos", icon: Video },
-  { href: "/admin/manage-blogs", label: "Blogs", icon: FileText },
+  { href: "/admin/blog", label: "Blogs", icon: FileText },
   { href: "/admin/manage-events", label: "Events", icon: Upload },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
