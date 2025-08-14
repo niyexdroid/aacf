@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { auth } from "@/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { Shield, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -21,8 +19,21 @@ export default function AdminLoginPage() {
     setError("");
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Failed to login");
+      }
+
       router.push("/admin");
+      router.refresh(); // Refresh the page to update session state
     } catch (err: any) {
       console.error("Login error:", err);
       setError(

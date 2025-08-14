@@ -7,16 +7,16 @@ import Link from "next/link";
 export function Events({
   events = [],
   showViewAllButton = true, // Default to true
+  truncateDescription = false,
 }: {
   events: any[];
   showViewAllButton?: boolean;
+  truncateDescription?: boolean;
 }) {
   return (
     <section className="bg-white py-24">
       <div className="container mx-auto px-4">
-        <h2 className="mb-16 text-center text-3xl font-bold">
-          Upcoming Events
-        </h2>
+        <h2 className="mb-16 text-center text-3xl font-bold">All Events</h2>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {events.map((event) => (
@@ -50,7 +50,28 @@ export function Events({
                   </div>
                 </div>
 
-                <p className="mb-6 flex-1 text-gray-600">{event.description}</p>
+                <p className="mb-6 flex-1 text-gray-600">
+                  {(() => {
+                    if (!event.description) return null;
+                    if (!truncateDescription) return event.description;
+                    const words = event.description.split(/\s+/);
+                    const LIMIT = 30;
+                    if (words.length <= LIMIT) return event.description;
+                    return words.slice(0, LIMIT).join(" ") + "...";
+                  })()}
+                </p>
+                {truncateDescription &&
+                  event.description &&
+                  event.description.split(/\s+/).length > 30 && (
+                    <div className="pb-4">
+                      <Link
+                        href="/events"
+                        className="text-sm font-medium text-orange-600 hover:underline"
+                      >
+                        Read More
+                      </Link>
+                    </div>
+                  )}
               </div>
             </div>
           ))}

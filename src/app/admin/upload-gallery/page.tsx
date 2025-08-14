@@ -11,7 +11,8 @@ import {
   FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { getEvents } from "@/actions/getEvents";
+// import { getEvents } from "@/actions/getEvents"; // avoid calling server action directly from client
+import { useToast } from "@/components/ui/Toast";
 
 interface GalleryImage {
   title: string;
@@ -32,15 +33,37 @@ export default function UploadGalleryPage() {
   });
   const [events, setEvents] = useState<any[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { addToast, ToastContainer } = useToast();
+  const [authChecked, setAuthChecked] = useState(false);
   const router = useRouter();
 
   // Fetch events for dropdown
   useEffect(() => {
-    const fetchEvents = async () => {
-      const eventsData = await getEvents();
-      setEvents(eventsData);
-    };
-    fetchEvents();
+    // auth + events fetch
+    (async () => {
+      try {
+        const sessionRes = await fetch("/api/auth/session", {
+          credentials: "include",
+        });
+        if (sessionRes.status === 401) {
+          addToast("Session expired. Please login.", "error");
+          router.push("/admin/login");
+          return;
+        }
+        const eventsRes = await fetch("/api/events", {
+          credentials: "include",
+        });
+        if (eventsRes.ok) {
+          const data = await eventsRes.json();
+          setEvents(data);
+        }
+      } catch (e) {
+        console.error("Failed to load events/auth", e);
+        addToast("Failed to load events", "error");
+      } finally {
+        setAuthChecked(true);
+      }
+    })();
   }, []);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,31 +79,50 @@ export default function UploadGalleryPage() {
 
     setUploading(true);
 
-    for (const file of files) {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
       try {
-        const response = await fetch(`/api/upload?filename=${file.name}`, {
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("filename", file.name);
+        const uploadRes = await fetch("/api/upload", {
           method: "POST",
-          body: file,
+          body: fd,
+          credentials: "include",
         });
+        if (uploadRes.status === 401) {
+          addToast("Not authorized. Please login again.", "error");
+          router.push("/admin/login");
+          return;
+        }
+        if (!uploadRes.ok) {
+          const detail = await uploadRes.json().catch(() => ({}));
+          throw new Error(
+            detail.error || `Upload failed (${uploadRes.status})`,
+          );
+        }
+        const newBlob = await uploadRes.json();
+        if (!newBlob?.url) throw new Error("Upload response missing url");
 
-        const newBlob = await response.json();
-
-        // Now, save the blob URL to your database
-        await fetch("/api/gallery", {
+        const galleryRes = await fetch("/api/gallery", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             url: newBlob.url,
-            caption: imageData.caption,
             title: imageData.title,
-            eventId: imageData.eventId,
+            caption: imageData.caption,
+            eventId: imageData.eventId || undefined,
           }),
+          credentials: "include",
         });
-      } catch (error) {
+        if (!galleryRes.ok) {
+          const gErr = await galleryRes.json().catch(() => ({}));
+          throw new Error(gErr.error || `Save failed (${galleryRes.status})`);
+        }
+        setUploadProgress(((i + 1) / files.length) * 100);
+      } catch (error: any) {
         console.error("Error uploading file:", error);
-        alert(`Error uploading file: ${file.name}`);
+        addToast(error.message || `Error uploading ${file.name}`, "error");
       }
     }
 
@@ -113,6 +155,7 @@ export default function UploadGalleryPage() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        <ToastContainer />
         <div className="mx-auto max-w-2xl">
           {/* File Upload Section */}
           <div className="mb-6 rounded-lg bg-white p-6 shadow-md">

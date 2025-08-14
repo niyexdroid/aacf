@@ -1,8 +1,16 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
 async function main() {
+  const password = await bcrypt.hash("password123", 10);
+  const user = await prisma.user.create({
+    data: {
+      email: "admin@aacf.com",
+      password,
+    },
+  });
   // Create sample events
   const events = await Promise.all([
     prisma.event.create({
@@ -99,8 +107,7 @@ The center is scheduled to open in September, and we're currently looking for vo
     }),
   ]);
 
-  console.log("Database seeded successfully!");
-  console.log(`Created ${events.length} events and ${blogs.length} blog posts`);
+  console.log({ events, blogs, user });
 }
 
 main()
@@ -110,4 +117,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    console.log("Database seeded successfully!");
   });

@@ -1,20 +1,31 @@
 import { put } from "@vercel/blob";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/session";
 
-export async function POST(request: Request): Promise<NextResponse> {
-  const { searchParams } = new URL(request.url);
-  const filename = searchParams.get("filename");
+export const dynamic = "force-dynamic";
 
-  if (!filename || !request.body) {
-    return NextResponse.json(
-      { error: "Missing filename or request body" },
-      { status: 400 },
-    );
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  const session = await getSession();
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  try {
+    const formData = await request.formData();
+    const file = formData.get("file");
+    if (!file || !(file instanceof File)) {
+      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    }
+    const name = formData.get("filename") as string | null;
+    const blobName = `uploads/${Date.now()}-${name || file.name}`;
+    const arrayBuffer = await file.arrayBuffer();
+    const { url } = await put(blobName, Buffer.from(arrayBuffer), {
+      access: "public",
+      addRandomSuffix: false,
+      contentType: file.type || "application/octet-stream",
+    });
+    return NextResponse.json({ url });
+  } catch (e) {
+    console.error("Upload failed", e);
+    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
-
-  const blob = await put(filename, request.body, {
-    access: "public",
-  });
-
-  return NextResponse.json(blob);
 }

@@ -1,4 +1,16 @@
 // Email service for sending donation-related emails
+import nodemailer from "nodemailer";
+
+// Create Gmail SMTP transporter
+const createTransporter = () => {
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_SMTP_USER || process.env.EMAIL_FROM,
+      pass: process.env.EMAIL_SMTP_PASS,
+    },
+  });
+};
 
 export interface EmailData {
   to: string;
@@ -222,5 +234,209 @@ This receipt serves as confirmation of your tax-deductible donation to ${data.ch
 ${data.charityName}
 Registered Non-Profit Organization
 Contact us: contact@yourcharity.org
+  `;
+};
+
+// Contact Form Email Interfaces
+export interface ContactFormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+export interface ContactNotificationData extends ContactFormData {
+  feedbackId: string;
+}
+
+// Send confirmation email to user who submitted contact form
+export const sendContactConfirmationEmail = async (
+  data: ContactFormData,
+): Promise<void> => {
+  try {
+    console.log("Preparing contact confirmation email for:", data.email);
+
+    // Send email using Gmail SMTP if credentials are available
+    if (process.env.EMAIL_SMTP_USER && process.env.EMAIL_SMTP_PASS) {
+      try {
+        const transporter = createTransporter();
+        const result = await transporter.sendMail({
+          from:
+            process.env.EMAIL_FROM || "abosedeainacharityfoundation@gmail.com",
+          to: data.email,
+          subject: `Thank you for contacting Abosede Aina Charity Foundation`,
+          html: generateContactConfirmationEmail(data),
+          text: generateContactConfirmationEmailText(data),
+        });
+        console.log("Email sent successfully:", result);
+      } catch (emailError) {
+        console.error("Gmail SMTP email error:", emailError);
+      }
+    } else {
+      console.log("No Gmail SMTP credentials found, email sending skipped");
+    }
+  } catch (error) {
+    console.error("Error sending contact confirmation email:", error);
+  }
+};
+
+// Send notification email to admin about new contact form submission
+export const sendContactNotificationEmail = async (
+  data: ContactNotificationData,
+): Promise<void> => {
+  try {
+    console.log("Preparing admin notification email");
+
+    // Send email using Gmail SMTP if credentials are available
+    if (process.env.EMAIL_SMTP_USER && process.env.EMAIL_SMTP_PASS) {
+      try {
+        const transporter = createTransporter();
+        const result = await transporter.sendMail({
+          from:
+            process.env.EMAIL_FROM || "abosedeainacharityfoundation@gmail.com",
+          to: "abosedeainacharityfoundation@gmail.com",
+          subject: `New Contact Form Submission: ${data.subject}`,
+          html: generateContactNotificationEmail(data),
+          text: generateContactNotificationEmailText(data),
+        });
+        console.log("Admin notification email sent successfully:", result);
+      } catch (emailError) {
+        console.error("Gmail SMTP admin email error:", emailError);
+      }
+    } else {
+      console.log(
+        "No Gmail SMTP credentials found, admin notification email sending skipped",
+      );
+    }
+  } catch (error) {
+    console.error("Error sending contact notification email:", error);
+  }
+};
+
+// Generate HTML for contact confirmation email
+const generateContactConfirmationEmail = (data: ContactFormData): string => {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Thank You for Contacting Us</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      
+      <!-- Header -->
+      <div style="text-align: center; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #2563eb 0%, #10b981 100%); border-radius: 10px;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">Thank You for Reaching Out!</h1>
+      </div>
+      
+      <!-- Main Content -->
+      <div style="background: #f8fafc; padding: 25px; border-radius: 10px; margin-bottom: 20px;">
+        <p style="margin: 0 0 15px 0; font-size: 16px;">Dear ${data.name},</p>
+        
+        <p style="margin: 0 0 15px 0;">Thank you for contacting Abosede Aina Charity Foundation. We have received your message and appreciate you taking the time to reach out to us.</p>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #2563eb; margin: 20px 0;">
+          <h3 style="margin: 0 0 10px 0; color: #2563eb;">Your Message Details:</h3>
+          <p style="margin: 5px 0;"><strong>Subject:</strong> ${data.subject}</p>
+          <p style="margin: 5px 0;"><strong>Message:</strong></p>
+          <p style="margin: 10px 0; padding: 15px; background: #f1f5f9; border-radius: 5px; font-style: italic;">${data.message}</p>
+        </div>
+        
+        <p style="margin: 15px 0;">Our team will review your message and get back to you within 24 hours during business days.</p>
+      </div>
+      
+      <!-- Footer -->
+      <div style="text-align: center; margin-top: 30px; padding: 20px; border-top: 2px solid #e5e7eb;">
+        <p style="margin: 0 0 10px 0; color: #6b7280;">Thank you for your interest in our mission!</p>
+        <p style="margin: 0; color: #6b7280; font-size: 14px;">
+          Abosede Aina Charity Foundation<br>
+          Making a difference in communities across Nigeria
+        </p>
+      </div>
+      
+    </body>
+    </html>
+  `;
+};
+
+// Generate text version for contact confirmation email
+const generateContactConfirmationEmailText = (
+  data: ContactFormData,
+): string => {
+  return `
+Dear ${data.name},
+
+Thank you for contacting Abosede Aina Charity Foundation. We have received your message and appreciate you taking the time to reach out to us.
+
+Your Message Details:
+Subject: ${data.subject}
+Message: ${data.message}
+
+Our team will review your message and get back to you within 24 hours during business days.
+
+Thank you for your interest in our mission!
+
+Abosede Aina Charity Foundation
+Making a difference in communities across Nigeria
+  `;
+};
+
+// Generate HTML for contact notification email to admin
+const generateContactNotificationEmail = (
+  data: ContactNotificationData,
+): string => {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>New Contact Form Submission</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      
+      <!-- Header -->
+      <div style="text-align: center; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%); border-radius: 10px;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">🔔 New Contact Form Submission</h1>
+      </div>
+      
+      <!-- Main Content -->
+      <div style="background: #fef2f2; padding: 25px; border-radius: 10px; margin-bottom: 20px;">
+        <h2 style="margin: 0 0 20px 0; color: #dc2626;">Contact Details</h2>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+          <p style="margin: 5px 0;"><strong>Name:</strong> ${data.name}</p>
+          <p style="margin: 5px 0;"><strong>Email:</strong> <a href="mailto:${data.email}">${data.email}</a></p>
+          <p style="margin: 5px 0;"><strong>Subject:</strong> ${data.subject}</p>
+          <p style="margin: 5px 0;"><strong>Feedback ID:</strong> ${data.feedbackId}</p>
+        </div>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px;">
+          <h3 style="margin: 0 0 10px 0; color: #dc2626;">Message:</h3>
+          <div style="background: #f8fafc; padding: 15px; border-radius: 5px;">${data.message}</div>
+        </div>
+      </div>
+      
+    </body>
+    </html>
+  `;
+};
+
+// Generate text version for contact notification email
+const generateContactNotificationEmailText = (
+  data: ContactNotificationData,
+): string => {
+  return `
+🔔 NEW CONTACT FORM SUBMISSION
+
+Contact Details:
+Name: ${data.name}
+Email: ${data.email}
+Subject: ${data.subject}
+Feedback ID: ${data.feedbackId}
+
+Message:
+${data.message}
+
+This is an automated notification from your website contact form.
   `;
 };
