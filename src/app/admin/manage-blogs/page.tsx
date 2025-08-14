@@ -1,17 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { db, storage } from "@/firebase";
-import {
-  collection,
-  getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  serverTimestamp,
-} from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+// Firebase removed: now using internal API routes (Prisma) + Vercel Blob upload
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -24,6 +14,7 @@ import {
   Image,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useToast } from "@/components/ui/Toast";
 
 interface BlogPost {
   id?: string;
@@ -43,6 +34,7 @@ export default function ManageBlogsPage() {
   const [showForm, setShowForm] = useState(false);
   const [uploading, setUploading] = useState(false);
   const router = useRouter();
+  const { addToast, ToastContainer } = useToast();
 
   useEffect(() => {
     fetchBlogs();
@@ -50,12 +42,20 @@ export default function ManageBlogsPage() {
 
   const fetchBlogs = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "blogs"));
-      const blogData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as BlogPost[];
-      setBlogs(blogData);
+      const res = await fetch("/api/blogs", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch blogs");
+      const data = await res.json();
+      const mapped = data.map((b: any) => ({
+        id: b.id,
+        title: b.title,
+        excerpt: b.excerpt,
+        content: b.content,
+        category: b.category,
+        date: new Date(b.createdAt).toISOString().split("T")[0],
+        image: b.image || undefined,
+        author: "Admin", // author not stored yet
+      }));
+      setBlogs(mapped);
     } catch (error) {
       console.error("Error fetching blogs:", error);
     } finally {
@@ -79,30 +79,65 @@ export default function ManageBlogsPage() {
     setUploading(true);
 
     try {
-      // Handle image upload
+      // Image upload via /api/upload
       const imageFile = formData.get("image") as File;
+      let imageUrl: string | undefined = undefined;
       if (imageFile && imageFile.size > 0) {
-        const storageRef = ref(
-          storage,
-          `blogs/${Date.now()}_${imageFile.name}`,
-        );
-        await uploadBytes(storageRef, imageFile);
-        const downloadURL = await getDownloadURL(storageRef);
-        blogData.image = downloadURL;
+        const fd = new FormData();
+        fd.append("file", imageFile);
+        fd.append("filename", imageFile.name);
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          body: fd,
+          credentials: "include",
+        });
+        if (uploadRes.ok) {
+          const { url } = await uploadRes.json();
+          imageUrl = url;
+        } else {
+          throw new Error("Image upload failed");
+        }
       }
 
+      let resp: Response;
       if (editingBlog?.id) {
-        // Update existing blog
-        await updateDoc(doc(db, "blogs", editingBlog.id), {
-          ...blogData,
-          timestamp: serverTimestamp(),
+        resp = await fetch(`/api/blogs/${editingBlog.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: blogData.title,
+            excerpt: blogData.excerpt,
+            content: blogData.content,
+            category: blogData.category,
+            image: imageUrl !== undefined ? imageUrl : editingBlog.image,
+          }),
+          credentials: "include",
         });
       } else {
-        // Create new blog
-        await addDoc(collection(db, "blogs"), {
-          ...blogData,
-          timestamp: serverTimestamp(),
+        resp = await fetch("/api/blogs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: blogData.title,
+            excerpt: blogData.excerpt,
+            content: blogData.content,
+            category: blogData.category,
+            image: imageUrl,
+          }),
+          credentials: "include",
         });
+      }
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error || "Request failed");
+      } else {
+        addToast(
+          editingBlog
+            ? "Blog updated successfully"
+            : "Blog created successfully",
+          "success",
+        );
       }
 
       // Reset form and refresh blogs
@@ -112,9 +147,9 @@ export default function ManageBlogsPage() {
 
       // Reset form
       e.currentTarget.reset();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving blog:", error);
-      alert("Error saving blog post. Please try again.");
+      addToast(error.message || "Error saving blog", "error");
     } finally {
       setUploading(false);
     }
@@ -128,11 +163,19 @@ export default function ManageBlogsPage() {
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this blog post?")) {
       try {
-        await deleteDoc(doc(db, "blogs", id));
+        const resp = await fetch(`/api/blogs/${id}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err.error || "Delete failed");
+        }
         fetchBlogs();
-      } catch (error) {
+        addToast("Blog deleted", "success");
+      } catch (error: any) {
         console.error("Error deleting blog:", error);
-        alert("Error deleting blog post. Please try again.");
+        addToast(error.message || "Error deleting blog", "error");
       }
     }
   };
@@ -152,6 +195,7 @@ export default function ManageBlogsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <ToastContainer />
       {/* Header */}
       <header className="border-b bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4">
@@ -284,16 +328,21 @@ export default function ManageBlogsPage() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="blog-image"
+                    className="mb-1 block text-sm font-medium text-gray-700"
+                  >
                     Featured Image
                   </label>
                   <input
+                    id="blog-image"
                     type="file"
                     name="image"
                     accept="image/*"
                     className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-orange-500"
                     title="Select featured image for blog post"
-                    placeholder="Choose image file"
+                    placeholder="Select image"
+                    aria-label="Featured image upload"
                   />
                   {editingBlog?.image && (
                     <p className="mt-1 text-sm text-gray-500">

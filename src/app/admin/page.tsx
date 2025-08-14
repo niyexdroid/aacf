@@ -2,27 +2,130 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Shield, Upload, FileText, Image, Video } from "lucide-react";
+import {
+  Loader2,
+  Shield,
+  Upload,
+  FileText,
+  Image,
+  Video,
+  MessageSquare,
+  Home,
+  Settings,
+} from "lucide-react";
+import { logout } from "@/actions/auth";
+import AdminNavbar from "@/components/AdminNavbar";
 
 export default function AdminPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [feedbackCount, setFeedbackCount] = useState<number>(0);
+  const [galleryCount, setGalleryCount] = useState<number>(0);
+  const [videosCount, setVideosCount] = useState<number>(0);
+  const [eventsCount, setEventsCount] = useState<number>(0);
+  const [blogsCount, setBlogsCount] = useState<number>(0);
   const router = useRouter();
 
   useEffect(() => {
-    // onAuthStateChanged(auth, (user) => {
-    //   if (user) {
-    //     setUser(user);
-    //   } else {
-    //     router.push("/admin/login");
-    //   }
-    // });
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/auth/session");
+        if (!res.ok) {
+          throw new Error("Not authenticated");
+        }
+        const data = await res.json();
+        setUser(data.user);
+
+        // Only fetch data after successful authentication
+        await Promise.all([
+          fetchFeedbackCount(),
+          fetchGalleryCount(),
+          fetchVideosCount(),
+          fetchEventsCount(),
+          fetchBlogsCount(),
+        ]);
+      } catch (error) {
+        router.push("/admin/login");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchFeedbackCount = async () => {
+      try {
+        const res = await fetch("/api/feedback", {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setFeedbackCount(data.feedbacks?.length || 0);
+        }
+      } catch (error) {
+        console.error("Error fetching feedback count:", error);
+      }
+    };
+
+    const fetchGalleryCount = async () => {
+      try {
+        const res = await fetch("/api/gallery-list", {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setGalleryCount(Array.isArray(data) ? data.length : 0);
+        }
+      } catch (error) {
+        console.error("Error fetching gallery count:", error);
+      }
+    };
+
+    const fetchVideosCount = async () => {
+      try {
+        const res = await fetch("/api/videos", {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setVideosCount(data.videos?.length || 0);
+        }
+      } catch (error) {
+        console.error("Error fetching videos count:", error);
+      }
+    };
+
+    const fetchEventsCount = async () => {
+      try {
+        const res = await fetch("/api/events", {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setEventsCount(Array.isArray(data) ? data.length : 0);
+        }
+      } catch (error) {
+        console.error("Error fetching events count:", error);
+      }
+    };
+
+    const fetchBlogsCount = async () => {
+      try {
+        const res = await fetch("/api/blogs", {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setBlogsCount(Array.isArray(data) ? data.length : 0);
+        }
+      } catch (error) {
+        console.error("Error fetching blogs count:", error);
+      }
+    };
+
+    fetchUser();
   }, [router]);
 
-  const handleLogout = () => {
-    // signOut(auth).then(() => {
-    //   router.push("/admin/login");
-    // });
+  const handleLogout = async () => {
+    await logout();
   };
 
   if (loading) {
@@ -64,6 +167,9 @@ export default function AdminPage() {
         </div>
       </header>
 
+      {/* Admin Navigation */}
+      <AdminNavbar />
+
       {/* Admin Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
@@ -72,11 +178,26 @@ export default function AdminPage() {
         </div>
 
         {/* Admin Cards */}
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5">
+          <div className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg">
+            <div className="mb-4 flex items-center justify-between">
+              <MessageSquare className="h-8 w-8 text-orange-500" />
+              <span className="text-2xl font-bold text-gray-900">
+                {feedbackCount}
+              </span>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Contact Messages
+            </h3>
+            <p className="text-sm text-gray-600">Total feedback received</p>
+          </div>
+
           <div className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg">
             <div className="mb-4 flex items-center justify-between">
               <Image className="h-8 w-8 text-orange-500" />
-              <span className="text-2xl font-bold text-gray-900">24</span>
+              <span className="text-2xl font-bold text-gray-900">
+                {galleryCount}
+              </span>
             </div>
             <h3 className="text-lg font-semibold text-gray-900">
               Gallery Images
@@ -87,7 +208,9 @@ export default function AdminPage() {
           <div className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg">
             <div className="mb-4 flex items-center justify-between">
               <Video className="h-8 w-8 text-orange-500" />
-              <span className="text-2xl font-bold text-gray-900">8</span>
+              <span className="text-2xl font-bold text-gray-900">
+                {videosCount}
+              </span>
             </div>
             <h3 className="text-lg font-semibold text-gray-900">Videos</h3>
             <p className="text-sm text-gray-600">Total videos uploaded</p>
@@ -96,7 +219,9 @@ export default function AdminPage() {
           <div className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg">
             <div className="mb-4 flex items-center justify-between">
               <FileText className="h-8 w-8 text-orange-500" />
-              <span className="text-2xl font-bold text-gray-900">12</span>
+              <span className="text-2xl font-bold text-gray-900">
+                {blogsCount}
+              </span>
             </div>
             <h3 className="text-lg font-semibold text-gray-900">Blog Posts</h3>
             <p className="text-sm text-gray-600">Published articles</p>
@@ -105,7 +230,9 @@ export default function AdminPage() {
           <div className="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg">
             <div className="mb-4 flex items-center justify-between">
               <Upload className="h-8 w-8 text-orange-500" />
-              <span className="text-2xl font-bold text-gray-900">5</span>
+              <span className="text-2xl font-bold text-gray-900">
+                {eventsCount}
+              </span>
             </div>
             <h3 className="text-lg font-semibold text-gray-900">Events</h3>
             <p className="text-sm text-gray-600">Active events</p>
@@ -114,6 +241,21 @@ export default function AdminPage() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <a
+            href="/admin/manage-feedback"
+            className="block rounded-lg bg-white p-6 shadow-md transition-all hover:-translate-y-1 hover:shadow-lg"
+          >
+            <div className="mb-4 flex items-center space-x-3">
+              <MessageSquare className="h-6 w-6 text-orange-500" />
+              <h3 className="text-lg font-semibold text-gray-900">
+                Manage Feedback
+              </h3>
+            </div>
+            <p className="text-sm text-gray-600">
+              View and respond to contact messages and feedback
+            </p>
+          </a>
+
           <a
             href="/admin/upload-gallery"
             className="block rounded-lg bg-white p-6 shadow-md transition-all hover:-translate-y-1 hover:shadow-lg"

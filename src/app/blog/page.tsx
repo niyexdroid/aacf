@@ -1,29 +1,11 @@
-"use client";
-import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/firebase"; // Adjust the path based on your project structure
-import { motion } from "framer-motion";
+import prisma from "@/lib/prisma";
 import { Calendar } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
-export default function BlogPage() {
-  const [blogs, setBlogs] = useState([]);
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const querysnapshot = await getDocs(collection(db, "blogs"));
-        const blogData = querysnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setBlogs(blogData);
-      } catch (error) {
-        console.error("Error fetching blogs:", error);
-      }
-    };
+export const dynamic = "force-dynamic";
 
-    fetchBlogs();
-  }, []);
+export default async function BlogPage() {
+  const blogs = await prisma.blog.findMany({ orderBy: { createdAt: "desc" } });
   return (
     <section className="bg-gray-50 py-24">
       <div className="container mx-auto px-4">
@@ -36,20 +18,18 @@ export default function BlogPage() {
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {blogs.map((post) => (
-            <motion.div
+            <div
               key={post.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: post.id * 0.1 }}
-              viewport={{ once: true }}
               className="group cursor-pointer overflow-hidden rounded-lg bg-white shadow-lg transition-all hover:shadow-xl"
             >
               <div className="relative h-48 overflow-hidden">
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
-                />
+                {post.image && (
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
+                )}
                 <div className="absolute left-4 top-4 rounded bg-[#ff6b00] px-3 py-1 text-sm text-white">
                   {post.category}
                 </div>
@@ -58,7 +38,7 @@ export default function BlogPage() {
               <div className="p-6">
                 <div className="mb-4 flex items-center gap-2 text-sm text-gray-500">
                   <Calendar className="h-4 w-4 text-[#ff6b00]" />
-                  <span>{post.date}</span>
+                  <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                 </div>
                 <h3 className="mb-2 text-xl font-semibold transition-colors group-hover:text-[#ff6b00]">
                   {post.title}
@@ -71,15 +51,9 @@ export default function BlogPage() {
                   Read More
                 </Button>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
-
-        {/* <div className="mt-12 text-center">
-          <Button className="bg-[#ff6b00] text-white hover:bg-[#ff6b00]/90">
-            View All Posts
-          </Button>
-        </div> */}
       </div>
     </section>
   );

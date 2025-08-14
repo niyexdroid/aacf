@@ -52,3 +52,4 @@ yarn-error.log*
 .vercel
 
 /generated/prisma
+.firebase/hosting.cHVibGlj.cache

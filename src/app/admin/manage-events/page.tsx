@@ -1,17 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { db, storage } from "@/firebase";
-import {
-  collection,
-  getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  serverTimestamp,
-} from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+// Firebase removed: now using internal API routes with Prisma + Vercel Blob
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -24,11 +14,13 @@ import {
   Image,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useToast } from "@/components/ui/Toast";
 
 interface Event {
   id?: string;
   title: string;
   date: string;
+  time?: string;
   location: string;
   description?: string;
   image?: string;
@@ -37,23 +29,50 @@ interface Event {
 export default function ManageEventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [uploading, setUploading] = useState(false);
   const router = useRouter();
+  const { addToast, ToastContainer } = useToast();
 
   useEffect(() => {
-    fetchEvents();
+    (async () => {
+      try {
+        const res = await fetch("/api/auth/session", {
+          credentials: "include",
+        });
+        if (res.status === 401) {
+          addToast("Session expired. Please login.", "error");
+          router.push("/admin/login");
+          return;
+        }
+        await fetchEvents();
+      } catch (e) {
+        console.error("Auth check failed", e);
+        addToast("Authentication check failed", "error");
+      } finally {
+        setAuthChecked(true);
+      }
+    })();
   }, []);
 
   const fetchEvents = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "events"));
-      const eventData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Event[];
-      setEvents(eventData);
+      const res = await fetch("/api/events", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch events");
+      const data = await res.json();
+      // map prisma Event model to local Event interface
+      const mapped = data.map((e: any) => ({
+        id: e.id,
+        title: e.title,
+        date: e.date?.split("T")[0] || "",
+        time: e.time || "",
+        location: e.location,
+        description: e.description,
+        image: e.image || undefined,
+      }));
+      setEvents(mapped);
     } catch (error) {
       console.error("Error fetching events:", error);
     } finally {
@@ -68,37 +87,88 @@ export default function ManageEventsPage() {
     const eventData: Event = {
       title: formData.get("title") as string,
       date: formData.get("date") as string,
+      time: (formData.get("time") as string) || "00:00",
       location: formData.get("location") as string,
-      description: formData.get("description") as string,
+      description: (formData.get("description") as string) || "",
     };
 
     setUploading(true);
 
     try {
-      // Handle image upload
+      // Image upload via /api/upload
       const imageFile = formData.get("image") as File;
+      let imageUrl: string | undefined = undefined;
       if (imageFile && imageFile.size > 0) {
-        const storageRef = ref(
-          storage,
-          `events/${Date.now()}_${imageFile.name}`,
-        );
-        await uploadBytes(storageRef, imageFile);
-        const downloadURL = await getDownloadURL(storageRef);
-        eventData.image = downloadURL;
+        const fd = new FormData();
+        fd.append("file", imageFile);
+        fd.append("filename", imageFile.name);
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          body: fd,
+          credentials: "include",
+        });
+        if (uploadRes.ok) {
+          const { url } = await uploadRes.json();
+          imageUrl = url;
+        } else {
+          if (uploadRes.status === 401) {
+            addToast("Not authorized. Please login again.", "error");
+            router.push("/admin/login");
+            return;
+          }
+          const detail = await uploadRes.json().catch(() => ({}));
+          throw new Error(
+            detail.error || `Image upload failed (${uploadRes.status})`,
+          );
+        }
       }
 
+      let resp: Response | undefined;
       if (editingEvent?.id) {
-        // Update existing event
-        await updateDoc(doc(db, "events", editingEvent.id), {
-          ...eventData,
-          timestamp: serverTimestamp(),
+        resp = await fetch(`/api/events/${editingEvent.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: eventData.title,
+            description: eventData.description,
+            date: eventData.date,
+            time: eventData.time,
+            location: eventData.location,
+            image: imageUrl !== undefined ? imageUrl : editingEvent.image,
+          }),
+          credentials: "include",
         });
       } else {
-        // Create new event
-        await addDoc(collection(db, "events"), {
-          ...eventData,
-          timestamp: serverTimestamp(),
+        resp = await fetch("/api/events", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: eventData.title,
+            description: eventData.description,
+            date: eventData.date,
+            time: eventData.time,
+            location: eventData.location,
+            image: imageUrl,
+          }),
+          credentials: "include",
         });
+      }
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        if (resp.status === 401) {
+          addToast("Session expired. Please login.", "error");
+          router.push("/admin/login");
+          return;
+        }
+        throw new Error(err.error || "Request failed");
+      } else {
+        addToast(
+          editingEvent
+            ? "Event updated successfully"
+            : "Event created successfully",
+          "success",
+        );
       }
 
       // Reset form and refresh events
@@ -108,9 +178,9 @@ export default function ManageEventsPage() {
 
       // Reset form
       e.currentTarget.reset();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving event:", error);
-      alert("Error saving event. Please try again.");
+      addToast(error.message || "Error saving event", "error");
     } finally {
       setUploading(false);
     }
@@ -124,11 +194,19 @@ export default function ManageEventsPage() {
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this event?")) {
       try {
-        await deleteDoc(doc(db, "events", id));
+        const resp = await fetch(`/api/events/${id}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err.error || "Delete failed");
+        }
         fetchEvents();
-      } catch (error) {
+        addToast("Event deleted", "success");
+      } catch (error: any) {
         console.error("Error deleting event:", error);
-        alert("Error deleting event. Please try again.");
+        addToast(error.message || "Error deleting event", "error");
       }
     }
   };
@@ -138,7 +216,7 @@ export default function ManageEventsPage() {
     setEditingEvent(null);
   };
 
-  if (loading) {
+  if (loading || !authChecked) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-orange-500"></div>
@@ -203,7 +281,7 @@ export default function ManageEventsPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
                       Date *
@@ -235,7 +313,20 @@ export default function ManageEventsPage() {
                       placeholder="Enter event location"
                     />
                   </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Time
+                    </label>
+                    <input
+                      type="time"
+                      name="time"
+                      defaultValue={editingEvent?.time || "12:00"}
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-orange-500"
+                      placeholder="Event time"
+                    />
+                  </div>
                 </div>
+                <ToastContainer />
 
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">
