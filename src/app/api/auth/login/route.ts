@@ -19,10 +19,10 @@ const loginSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     console.log("[login] Starting login attempt...");
-    
+
     const body = await request.json();
     console.log("[login] Request body received");
-    
+
     const { email, password } = loginSchema.parse(body);
     console.log("[login] Schema validation passed for email:", email);
 
@@ -81,9 +81,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: "Logged in successfully",
-      user: { id: user.id, email: user.email }
+      user: { id: user.id, email: user.email },
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -95,9 +95,9 @@ export async function POST(request: NextRequest) {
     }
     console.error("[login] Unexpected error:", error);
     return NextResponse.json(
-      { 
+      {
         message: "Internal server error",
-        error: process.env.NODE_ENV === "development" ? error : undefined
+        error: process.env.NODE_ENV === "development" ? error : undefined,
       },
       { status: 500 },
     );
