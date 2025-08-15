@@ -9,7 +9,7 @@ export default function ContactPage() {
         <div className="hero-contact-bg absolute inset-0" />
 
         {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-orange-900/60 via-orange-800/50 to-red-800/60" />
+        <div className="hero-dark-overlay absolute inset-0" />
 
         {/* Content */}
         <div className="container relative mx-auto px-4 text-center">
@@ -82,7 +82,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">Phone</h3>
-                    <p className="text-gray-600">+234 (0) 123 456 7890</p>
+                    <p className="text-gray-600">+2348168819022</p>
                   </div>
                 </div>
 
@@ -111,7 +111,7 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold text-gray-900">Address</h3>
                     <p className="text-gray-600">
-                      123 Charity Street
+                      Plot 53 Block 99 Flat 1, Iba Housing Estate, Iba -Ojo
                       <br />
                       Lagos, Nigeria
                     </p>

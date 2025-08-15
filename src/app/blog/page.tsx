@@ -15,7 +15,7 @@ export default async function BlogPage() {
         {/* Background Image */}
         <div className="hero-contact-bg absolute inset-0" />
         {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-orange-900/80 via-orange-800/70 to-red-800/80" />
+        <div className="hero-dark-overlay absolute inset-0" />
 
         {/* Content */}
         <div className="container relative mx-auto px-4 text-center">

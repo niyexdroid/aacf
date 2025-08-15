@@ -37,16 +37,17 @@ export default async function BlogPostPage({ params }: BlogPostProps) {
       {/* Hero Section */}
       <section className="relative py-20 text-white">
         {/* Background Image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: post.image
-              ? `url(${post.image})`
-              : "url('/hero-contact-bg.jpg')",
-          }}
-        />
+        {post.image ? (
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            // eslint-disable-next-line react/forbid-dom-props
+            style={{ backgroundImage: `url(${post.image})` }}
+          />
+        ) : (
+          <div className="blog-post-hero-bg absolute inset-0" />
+        )}
         {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-orange-900/70 via-orange-800/50 to-red-800/70" />
+        <div className="hero-dark-overlay absolute inset-0" />
 
         {/* Content */}
         <div className="container relative mx-auto px-4">

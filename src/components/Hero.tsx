@@ -37,10 +37,12 @@ export function Hero() {
             backgroundImage: `url(${images[currentImage]})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
-            filter: "brightness(0.7)",
           }}
         />
       </AnimatePresence>
+
+      {/* Dark overlay for better text visibility */}
+      <div className="hero-dark-overlay absolute inset-0 z-0" />
 
       <div className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 gap-2">
         {images.map((_, index) => (

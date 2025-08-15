@@ -36,9 +36,11 @@ export default function AboutPage() {
           <img
             src="https://ik.imagekit.io/niyexdroid/bg-1.jpg?updatedAt=1754320829824"
             alt="Children being helped"
-            className="h-full w-full object-cover opacity-40"
+            className="h-full w-full object-cover"
           />
         </div>
+        {/* Dark overlay for better text visibility */}
+        <div className="hero-dark-overlay absolute inset-0" />
         <div className="container relative mx-auto px-4 py-32">
           <h1 className="mb-6 text-5xl font-bold">About Our Mission</h1>
           <p className="max-w-2xl text-xl">

@@ -114,3 +114,16 @@ nextjs-portal {
   background-position: center;
   background-repeat: no-repeat;
 }
+
+/* Dark overlay for all hero sections */
+.hero-dark-overlay {
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+}
+
+/* Default hero background for blog posts */
+.blog-post-hero-bg {
+  background-image: url("/hero-contact-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
