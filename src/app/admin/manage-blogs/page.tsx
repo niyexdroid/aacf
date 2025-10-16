@@ -269,12 +269,17 @@ export default function ManageBlogsPage() {
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="blog-date"
+                      className="mb-1 block text-sm font-medium text-gray-700"
+                    >
                       Date *
                     </label>
                     <input
+                      id="blog-date"
                       type="date"
                       name="date"
+                      aria-required="true"
                       defaultValue={
                         editingBlog?.date ||
                         new Date().toISOString().split("T")[0]

@@ -65,6 +65,8 @@ export function Testimonials() {
           <button
             onClick={prev}
             className="absolute left-0 top-1/2 -translate-y-1/2 rounded-full bg-white p-2 shadow-lg transition-all hover:scale-110"
+            aria-label="Previous testimonial"
+            title="View previous testimonial"
           >
             <ChevronLeft className="h-6 w-6 text-[#ff6b00]" />
           </button>
@@ -72,6 +74,8 @@ export function Testimonials() {
           <button
             onClick={next}
             className="absolute right-0 top-1/2 -translate-y-1/2 rounded-full bg-white p-2 shadow-lg transition-all hover:scale-110"
+            aria-label="Next testimonial"
+            title="View next testimonial"
           >
             <ChevronRight className="h-6 w-6 text-[#ff6b00]" />
           </button>

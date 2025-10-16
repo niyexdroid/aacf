@@ -5,7 +5,7 @@ import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { ToastPortalClient } from "@/components/ToastPortalClient";
+import { ToastProvider } from "@/components/Toast";
 
 export const metadata: Metadata = {
   title: "AAC Foundation | Making a Difference",
@@ -39,7 +39,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Client-only hook usage guard: wrap toast container in a client component shim
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <head>
@@ -49,13 +48,12 @@ export default function RootLayout({
         <link rel="mask-icon" href="/Logo.jpg" color="#ea580c" />
       </head>
       <body className="min-h-screen bg-background font-sans antialiased">
-        <Navbar />
-        <main className="pt-20">{children}</main>
-        <Footer />
-        <ToastPortalClient />
+        <ToastProvider>
+          <Navbar />
+          <main className="pt-20">{children}</main>
+          <Footer />
+        </ToastProvider>
       </body>
     </html>
   );
 }
-
-// Toast portal moved to client component to avoid server hook usage

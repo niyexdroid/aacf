@@ -26,6 +26,9 @@ model Event {
   videos      Video[]
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
+
+  @@index([date])
+  @@index([createdAt])
 }
 
 model GalleryImage {
@@ -37,6 +40,9 @@ model GalleryImage {
   eventId   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([eventId])
+  @@index([createdAt])
 }
 
 model Video {
@@ -48,6 +54,9 @@ model Video {
   eventId     String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([eventId])
+  @@index([createdAt])
 }
 
 model Blog {
@@ -59,6 +68,9 @@ model Blog {
   content   String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([createdAt])
 }
 
 model Donor {
@@ -72,6 +84,10 @@ model Donor {
   paymentMethod    String?  @default("paystack")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+
+  @@index([email])
+  @@index([createdAt])
+  @@index([paymentStatus])
 }
 
 model User {
@@ -91,4 +107,8 @@ model Feedback {
   status    String   @default("new") // new, read, resolved
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([email])
 }

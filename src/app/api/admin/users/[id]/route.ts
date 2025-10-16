@@ -5,16 +5,13 @@ import { getSession } from "@/lib/session";
 // DELETE /api/admin/users/[id] - Delete a user
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Check if user is authenticated
     const session = await getSession();
     if (!session?.userId) {
-      return NextResponse.json(
-        { message: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -23,7 +20,7 @@ export async function DELETE(
     if (id === session.userId) {
       return NextResponse.json(
         { message: "Cannot delete your own account" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -33,10 +30,7 @@ export async function DELETE(
     });
 
     if (!userToDelete) {
-      return NextResponse.json(
-        { message: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
     // Check if this is the last admin user
@@ -44,7 +38,7 @@ export async function DELETE(
     if (userCount <= 1) {
       return NextResponse.json(
         { message: "Cannot delete the last admin user" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -60,7 +54,7 @@ export async function DELETE(
     console.error("Delete user error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

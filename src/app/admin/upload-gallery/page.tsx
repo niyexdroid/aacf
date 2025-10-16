@@ -215,7 +215,10 @@ export default function UploadGalleryPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="image-title"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
                   Title *
                 </label>
                 <div className="relative">
@@ -223,6 +226,7 @@ export default function UploadGalleryPage() {
                     <Tag className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
+                    id="image-title"
                     type="text"
                     value={imageData.title}
                     onChange={(e) =>
@@ -231,12 +235,16 @@ export default function UploadGalleryPage() {
                     className="w-full rounded-md border border-gray-300 px-3 py-2 pl-10 focus:border-orange-500 focus:outline-none focus:ring-orange-500"
                     placeholder="Enter image title"
                     required
+                    aria-required="true"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="image-caption"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
                   Caption
                 </label>
                 <div className="relative">
@@ -244,6 +252,7 @@ export default function UploadGalleryPage() {
                     <FileText className="h-5 w-5 text-gray-400" />
                   </div>
                   <textarea
+                    id="image-caption"
                     value={imageData.caption}
                     onChange={(e) =>
                       setImageData({ ...imageData, caption: e.target.value })
@@ -257,7 +266,10 @@ export default function UploadGalleryPage() {
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="image-date"
+                    className="mb-1 block text-sm font-medium text-gray-700"
+                  >
                     Date
                   </label>
                   <div className="relative">
@@ -265,6 +277,7 @@ export default function UploadGalleryPage() {
                       <Calendar className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
+                      id="image-date"
                       type="date"
                       value={imageData.date}
                       onChange={(e) =>
@@ -278,10 +291,14 @@ export default function UploadGalleryPage() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="image-event"
+                    className="mb-1 block text-sm font-medium text-gray-700"
+                  >
                     Event (Optional)
                   </label>
                   <select
+                    id="image-event"
                     value={imageData.eventId}
                     onChange={(e) =>
                       setImageData({ ...imageData, eventId: e.target.value })

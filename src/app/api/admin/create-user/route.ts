@@ -5,7 +5,10 @@ import { getSession } from "@/lib/session";
 import bcrypt from "bcrypt";
 
 const createUserSchema = z.object({
-  email: z.string().email().transform(v => v.toLowerCase().trim()),
+  email: z
+    .string()
+    .email()
+    .transform((v) => v.toLowerCase().trim()),
   password: z.string().min(6),
 });
 
@@ -14,10 +17,7 @@ export async function POST(request: NextRequest) {
     // Check if user is authenticated
     const session = await getSession();
     if (!session?.userId) {
-      return NextResponse.json(
-        { message: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     if (existingUser) {
       return NextResponse.json(
         { message: "User with this email already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -58,14 +58,14 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { message: "Invalid request data", errors: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Create user error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

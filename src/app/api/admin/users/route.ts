@@ -8,10 +8,7 @@ export async function GET() {
     // Check if user is authenticated
     const session = await getSession();
     if (!session?.userId) {
-      return NextResponse.json(
-        { message: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const users = await prisma.user.findMany({
@@ -31,7 +28,7 @@ export async function GET() {
     console.error("Get users error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

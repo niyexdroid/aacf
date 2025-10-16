@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
+import { invalidateCache } from "@/lib/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,10 @@ export async function PATCH(
         ...(image !== undefined && { image }),
       },
     });
+
+    // Invalidate blog cache
+    invalidateCache("blogs:*");
+
     return NextResponse.json(blog);
   } catch (e) {
     console.error("PATCH /api/blogs/[id] error", e);
@@ -47,6 +52,10 @@ export async function DELETE(
 
     const { id } = await params;
     await prisma.blog.delete({ where: { id } });
+
+    // Invalidate blog cache
+    invalidateCache("blogs:*");
+
     return NextResponse.json({ success: true });
   } catch (e) {
     console.error("DELETE /api/blogs/[id] error", e);

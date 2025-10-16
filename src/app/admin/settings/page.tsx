@@ -262,60 +262,85 @@ export default function AdminSettingsPage() {
             ) : (
               <form onSubmit={handlePasswordChange} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="current-password"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Current Password
                   </label>
                   <div className="relative">
                     <input
+                      id="current-password"
                       type={showCurrentPassword ? "text" : "password"}
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:border-orange-500 focus:outline-none"
                       required
+                      aria-required="true"
                     />
                     <button
                       type="button"
-                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      onClick={() =>
+                        setShowCurrentPassword(!showCurrentPassword)
+                      }
                       className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
                     >
-                      {showCurrentPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      {showCurrentPassword ? (
+                        <EyeOff size={20} />
+                      ) : (
+                        <Eye size={20} />
+                      )}
                     </button>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="new-password"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     New Password
                   </label>
                   <div className="relative">
                     <input
+                      id="new-password"
                       type={showNewPassword ? "text" : "password"}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:border-orange-500 focus:outline-none"
                       required
                       minLength={6}
+                      aria-required="true"
                     />
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
                       className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
                     >
-                      {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      {showNewPassword ? (
+                        <EyeOff size={20} />
+                      ) : (
+                        <Eye size={20} />
+                      )}
                     </button>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="confirm-password"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Confirm New Password
                   </label>
                   <input
+                    id="confirm-password"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none"
                     required
+                    aria-required="true"
                   />
                 </div>
 
@@ -365,39 +390,58 @@ export default function AdminSettingsPage() {
 
             {/* New User Form */}
             {showNewUserForm && (
-              <form onSubmit={handleCreateUser} className="mb-6 space-y-4 border-b pb-6">
+              <form
+                onSubmit={handleCreateUser}
+                className="mb-6 space-y-4 border-b pb-6"
+              >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="new-user-email"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Email Address
                   </label>
                   <input
+                    id="new-user-email"
                     type="email"
                     value={newUserEmail}
                     onChange={(e) => setNewUserEmail(e.target.value)}
                     className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none"
                     required
+                    aria-required="true"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="new-user-password"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Password
                   </label>
                   <div className="relative">
                     <input
+                      id="new-user-password"
                       type={showNewUserPassword ? "text" : "password"}
                       value={newUserPassword}
                       onChange={(e) => setNewUserPassword(e.target.value)}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:border-orange-500 focus:outline-none"
                       required
                       minLength={6}
+                      aria-required="true"
                     />
                     <button
                       type="button"
-                      onClick={() => setShowNewUserPassword(!showNewUserPassword)}
+                      onClick={() =>
+                        setShowNewUserPassword(!showNewUserPassword)
+                      }
                       className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
                     >
-                      {showNewUserPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      {showNewUserPassword ? (
+                        <EyeOff size={20} />
+                      ) : (
+                        <Eye size={20} />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -433,16 +477,21 @@ export default function AdminSettingsPage() {
                   className="flex items-center justify-between rounded-lg border p-3"
                 >
                   <div>
-                    <p className="font-medium text-gray-900">{adminUser.email}</p>
+                    <p className="font-medium text-gray-900">
+                      {adminUser.email}
+                    </p>
                     <p className="text-sm text-gray-500">
-                      Created: {new Date(adminUser.createdAt).toLocaleDateString()}
+                      Created:{" "}
+                      {new Date(adminUser.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="flex space-x-2">
                     {users.length > 1 && (
                       <Button
-                        onClick={() => handleDeleteUser(adminUser.id, adminUser.email)}
-                        className="bg-red-500 hover:bg-red-600 text-white"
+                        onClick={() =>
+                          handleDeleteUser(adminUser.id, adminUser.email)
+                        }
+                        className="bg-red-500 text-white hover:bg-red-600"
                         size="sm"
                       >
                         <Trash2 className="h-4 w-4" />

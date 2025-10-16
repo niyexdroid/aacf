@@ -187,7 +187,10 @@ export default function UploadVideosPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="video-title"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
                   Title *
                 </label>
                 <div className="relative">
@@ -195,6 +198,7 @@ export default function UploadVideosPage() {
                     <Tag className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
+                    id="video-title"
                     type="text"
                     value={videoData.title}
                     onChange={(e) =>
@@ -203,12 +207,16 @@ export default function UploadVideosPage() {
                     className="w-full rounded-md border border-gray-300 px-3 py-2 pl-10 focus:border-orange-500 focus:outline-none focus:ring-orange-500"
                     placeholder="Enter video title"
                     required
+                    aria-required="true"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="video-description"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
                   Description
                 </label>
                 <div className="relative">
@@ -216,6 +224,7 @@ export default function UploadVideosPage() {
                     <FileText className="h-5 w-5 text-gray-400" />
                   </div>
                   <textarea
+                    id="video-description"
                     value={videoData.description}
                     onChange={(e) =>
                       setVideoData({
@@ -232,7 +241,10 @@ export default function UploadVideosPage() {
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="video-date"
+                    className="mb-1 block text-sm font-medium text-gray-700"
+                  >
                     Date
                   </label>
                   <div className="relative">
@@ -240,6 +252,7 @@ export default function UploadVideosPage() {
                       <Calendar className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
+                      id="video-date"
                       type="date"
                       value={videoData.date}
                       onChange={(e) =>
@@ -253,10 +266,14 @@ export default function UploadVideosPage() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="video-event"
+                    className="mb-1 block text-sm font-medium text-gray-700"
+                  >
                     Event (Optional)
                   </label>
                   <select
+                    id="video-event"
                     value={videoData.eventId}
                     onChange={(e) =>
                       setVideoData({ ...videoData, eventId: e.target.value })

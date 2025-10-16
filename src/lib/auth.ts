@@ -37,7 +37,7 @@ export async function encrypt(payload: any) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("7d")
+    .setExpirationTime("24h") // Changed from 7d to 24h
     .sign(getEncodedKey());
 }
 
@@ -53,8 +53,8 @@ export async function decrypt(session: string | undefined = "") {
 }
 
 export async function createSession(userId: string) {
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  const session = await encrypt({ userId, expiresAt });
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  const session = await encrypt({ userId, expiresAt: expiresAt.getTime() });
   const store = await cookies();
   store.set("session", session, {
     httpOnly: true,
@@ -70,7 +70,14 @@ export async function updateSession(request: NextRequest) {
   if (!session) return;
   const payload = await decrypt(session);
   if (!payload) return;
-  const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+  // Check if session is expired
+  if (payload.expiresAt && payload.expiresAt < Date.now()) {
+    await deleteSession();
+    return;
+  }
+
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
   const store = await cookies();
   store.set("session", session, {
     httpOnly: true,
@@ -84,6 +91,23 @@ export async function updateSession(request: NextRequest) {
 export async function deleteSession() {
   const store = await cookies();
   store.delete("session");
+}
+
+export async function getSession() {
+  const store = await cookies();
+  const session = store.get("session")?.value;
+
+  if (!session) return null;
+
+  const payload = await decrypt(session);
+
+  // Check if session is expired
+  if (payload?.expiresAt && payload.expiresAt < Date.now()) {
+    await deleteSession();
+    return null;
+  }
+
+  return payload;
 }
 
 export async function verifySessionToken(request: NextRequest) {
