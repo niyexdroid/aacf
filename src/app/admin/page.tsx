@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Home,
   Settings,
+  Activity,
 } from "lucide-react";
 import { logout } from "@/actions/auth";
 import AdminNavbar from "@/components/AdminNavbar";
@@ -327,6 +328,24 @@ export default function AdminPage() {
             </div>
             <p className="text-sm text-gray-600">
               Configure admin settings and preferences
+            </p>
+          </a>
+
+          <a
+            href="/admin/performance"
+            className="block rounded-lg bg-gradient-to-br from-green-50 to-blue-50 p-6 shadow-md transition-all hover:-translate-y-1 hover:shadow-lg border-2 border-green-200"
+          >
+            <div className="mb-4 flex items-center space-x-3">
+              <Activity className="h-6 w-6 text-green-600" />
+              <h3 className="text-lg font-semibold text-gray-900">
+                Performance Monitor
+                <span className="ml-2 inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                  NEW
+                </span>
+              </h3>
+            </div>
+            <p className="text-sm text-gray-600">
+              Track cache, database stats, and API response times
             </p>
           </a>
         </div>
