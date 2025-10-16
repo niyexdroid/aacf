@@ -3,6 +3,8 @@
  * For production, consider using Redis or another distributed cache
  */
 
+import { logCacheOperation } from './logger';
+
 interface CacheEntry<T> {
   data: T;
   expiresAt: number;
@@ -20,15 +22,18 @@ class MemoryCache {
     const entry = this.cache.get(key);
 
     if (!entry) {
+      logCacheOperation('miss', key);
       return null;
     }
 
     // Check if expired
     if (Date.now() > entry.expiresAt) {
       this.cache.delete(key);
+      logCacheOperation('miss', key);
       return null;
     }
 
+    logCacheOperation('hit', key);
     return entry.data;
   }
 
@@ -41,6 +46,7 @@ class MemoryCache {
   set<T>(key: string, data: T, ttl: number = 300): void {
     const expiresAt = Date.now() + ttl * 1000;
     this.cache.set(key, { data, expiresAt });
+    logCacheOperation('set', key);
   }
 
   /**
@@ -49,6 +55,7 @@ class MemoryCache {
    */
   delete(key: string): void {
     this.cache.delete(key);
+    logCacheOperation('delete', key);
   }
 
   /**

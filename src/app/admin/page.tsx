@@ -333,7 +333,7 @@ export default function AdminPage() {
 
           <a
             href="/admin/performance"
-            className="block rounded-lg bg-gradient-to-br from-green-50 to-blue-50 p-6 shadow-md transition-all hover:-translate-y-1 hover:shadow-lg border-2 border-green-200"
+            className="block rounded-lg border-2 border-green-200 bg-gradient-to-br from-green-50 to-blue-50 p-6 shadow-md transition-all hover:-translate-y-1 hover:shadow-lg"
           >
             <div className="mb-4 flex items-center space-x-3">
               <Activity className="h-6 w-6 text-green-600" />
