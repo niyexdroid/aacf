@@ -3,7 +3,14 @@
  * Stores recent logs with timestamps and log levels
  */
 
-export type LogLevel = 'info' | 'success' | 'warning' | 'error' | 'cache' | 'db' | 'api';
+export type LogLevel =
+  | "info"
+  | "success"
+  | "warning"
+  | "error"
+  | "cache"
+  | "db"
+  | "api";
 
 export interface LogEntry {
   id: string;
@@ -41,9 +48,12 @@ class Logger {
     this.notifyListeners();
 
     // Also log to console in development
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       const emoji = this.getEmoji(level);
-      console.log(`${emoji} [${level.toUpperCase()}] ${message}`, metadata || '');
+      console.log(
+        `${emoji} [${level.toUpperCase()}] ${message}`,
+        metadata || "",
+      );
     }
   }
 
@@ -51,31 +61,31 @@ class Logger {
    * Convenience methods
    */
   info(message: string, metadata?: Record<string, any>) {
-    this.log('info', message, metadata);
+    this.log("info", message, metadata);
   }
 
   success(message: string, metadata?: Record<string, any>) {
-    this.log('success', message, metadata);
+    this.log("success", message, metadata);
   }
 
   warning(message: string, metadata?: Record<string, any>) {
-    this.log('warning', message, metadata);
+    this.log("warning", message, metadata);
   }
 
   error(message: string, metadata?: Record<string, any>) {
-    this.log('error', message, metadata);
+    this.log("error", message, metadata);
   }
 
   cache(message: string, metadata?: Record<string, any>) {
-    this.log('cache', message, metadata);
+    this.log("cache", message, metadata);
   }
 
   db(message: string, metadata?: Record<string, any>) {
-    this.log('db', message, metadata);
+    this.log("db", message, metadata);
   }
 
   api(message: string, metadata?: Record<string, any>) {
-    this.log('api', message, metadata);
+    this.log("api", message, metadata);
   }
 
   /**
@@ -92,7 +102,7 @@ class Logger {
    * Get logs filtered by level
    */
   getLogsByLevel(level: LogLevel, limit?: number): LogEntry[] {
-    const filtered = this.logs.filter(log => log.level === level);
+    const filtered = this.logs.filter((log) => log.level === level);
     if (limit) {
       return filtered.slice(-limit);
     }
@@ -119,7 +129,7 @@ class Logger {
    * Notify all subscribers
    */
   private notifyListeners() {
-    this.listeners.forEach(listener => {
+    this.listeners.forEach((listener) => {
       listener(this.getLogs());
     });
   }
@@ -129,15 +139,15 @@ class Logger {
    */
   private getEmoji(level: LogLevel): string {
     const emojis: Record<LogLevel, string> = {
-      info: 'ℹ️',
-      success: '✅',
-      warning: '⚠️',
-      error: '❌',
-      cache: '💾',
-      db: '🗄️',
-      api: '🔌',
+      info: "ℹ️",
+      success: "✅",
+      warning: "⚠️",
+      error: "❌",
+      cache: "💾",
+      db: "🗄️",
+      api: "🔌",
     };
-    return emojis[level] || '📝';
+    return emojis[level] || "📝";
   }
 
   /**
@@ -154,7 +164,7 @@ class Logger {
       api: 0,
     };
 
-    this.logs.forEach(log => {
+    this.logs.forEach((log) => {
       stats[log.level]++;
     });
 
@@ -169,22 +179,36 @@ class Logger {
 const logger = new Logger();
 
 // Log initialization
-logger.info('Logger initialized', { timestamp: new Date().toISOString() });
+logger.info("Logger initialized", { timestamp: new Date().toISOString() });
 
 export default logger;
 
 /**
  * Middleware-style logger for API routes
  */
-export function logApiRequest(method: string, path: string, duration: number, status: number) {
-  const level: LogLevel = status >= 500 ? 'error' : status >= 400 ? 'warning' : 'success';
-  logger.api(`${method} ${path} - ${status}`, { method, path, duration, status });
+export function logApiRequest(
+  method: string,
+  path: string,
+  duration: number,
+  status: number,
+) {
+  const level: LogLevel =
+    status >= 500 ? "error" : status >= 400 ? "warning" : "success";
+  logger.api(`${method} ${path} - ${status}`, {
+    method,
+    path,
+    duration,
+    status,
+  });
 }
 
 /**
  * Log cache operations
  */
-export function logCacheOperation(operation: 'hit' | 'miss' | 'set' | 'delete', key: string) {
+export function logCacheOperation(
+  operation: "hit" | "miss" | "set" | "delete",
+  key: string,
+) {
   const messages = {
     hit: `Cache HIT: ${key}`,
     miss: `Cache MISS: ${key}`,
@@ -197,6 +221,14 @@ export function logCacheOperation(operation: 'hit' | 'miss' | 'set' | 'delete', 
 /**
  * Log database operations
  */
-export function logDbOperation(operation: string, table: string, duration: number) {
-  logger.db(`${operation} on ${table} (${duration.toFixed(0)}ms)`, { operation, table, duration });
+export function logDbOperation(
+  operation: string,
+  table: string,
+  duration: number,
+) {
+  logger.db(`${operation} on ${table} (${duration.toFixed(0)}ms)`, {
+    operation,
+    table,
+    duration,
+  });
 }

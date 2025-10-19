@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   const startTime = Date.now();
   let status = 200;
-  
+
   try {
     const { searchParams } = new URL(req.url);
     const page = searchParams.get("page") || "1";
@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const startTime = Date.now();
   let status = 201;
-  
+
   try {
     const session = await getSession();
     if (!session) {
@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
-    
+
     const dbStartTime = Date.now();
     const blog = await prisma.blog.create({
       data: { title, excerpt, content, category, image: image || null },

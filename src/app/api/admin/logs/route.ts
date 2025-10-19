@@ -1,20 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
-import logger from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
+import logger from "@/lib/logger";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
     // Check authentication
     const session = await getSession();
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const limit = parseInt(searchParams.get('limit') || '100');
-    const level = searchParams.get('level');
+    const limit = parseInt(searchParams.get("limit") || "100");
+    const level = searchParams.get("level");
 
     let logs;
     if (level) {
@@ -31,10 +31,10 @@ export async function GET(req: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Logs fetch error:', error);
+    console.error("Logs fetch error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch logs' },
-      { status: 500 }
+      { error: "Failed to fetch logs" },
+      { status: 500 },
     );
   }
 }
@@ -44,17 +44,17 @@ export async function DELETE(req: NextRequest) {
     // Check authentication
     const session = await getSession();
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     logger.clear();
 
-    return NextResponse.json({ success: true, message: 'Logs cleared' });
+    return NextResponse.json({ success: true, message: "Logs cleared" });
   } catch (error) {
-    console.error('Logs clear error:', error);
+    console.error("Logs clear error:", error);
     return NextResponse.json(
-      { error: 'Failed to clear logs' },
-      { status: 500 }
+      { error: "Failed to clear logs" },
+      { status: 500 },
     );
   }
 }
