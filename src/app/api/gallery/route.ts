@@ -1,14 +1,22 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { logApiRequest } from "@/lib/logger";
 
 export async function POST(request: Request) {
-  const session = await getSession();
-  if (!session)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const data = await request.json();
+  const startTime = Date.now();
+  let status = 201;
+
   try {
+    const session = await getSession();
+    if (!session) {
+      status = 401;
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const data = await request.json();
+
     if (!data.url || !data.title) {
+      status = 400;
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },
@@ -16,6 +24,7 @@ export async function POST(request: Request) {
     }
     // If eventId optional but schema requires, fallback to first event or create placeholder? For now require provided.
     if (!data.eventId) {
+      status = 400;
       return NextResponse.json(
         { error: "eventId is required" },
         { status: 400 },
@@ -31,29 +40,43 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(image);
   } catch (error) {
+    status = 500;
     console.error("Error creating gallery image:", error);
     return NextResponse.json(
       { error: "Error creating gallery image" },
       { status: 500 },
     );
+  } finally {
+    logApiRequest("POST", "/api/gallery", Date.now() - startTime, status);
   }
 }
 
 export async function DELETE(request: Request) {
-  const session = await getSession();
-  if (!session)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
-  if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
+  const startTime = Date.now();
+  let status = 200;
+
   try {
+    const session = await getSession();
+    if (!session) {
+      status = 401;
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    if (!id) {
+      status = 400;
+      return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    }
     await prisma.galleryImage.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
+    status = 500;
     console.error("Error deleting gallery image:", error);
     return NextResponse.json(
       { error: "Error deleting gallery image" },
       { status: 500 },
     );
+  } finally {
+    logApiRequest("DELETE", "/api/gallery", Date.now() - startTime, status);
   }
 }

@@ -6,7 +6,7 @@ import {
   parsePaginationParams,
   createPaginationResult,
 } from "@/lib/pagination";
-import { logApiRequest, logDbOperation } from "@/lib/logger";
+import { logApiRequest } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
@@ -39,8 +39,7 @@ export async function GET(req: NextRequest) {
     // Build where clause
     const where = category ? { category } : {};
 
-    // Fetch data with pagination
-    const dbStartTime = Date.now();
+    // Fetch data with pagination (Prisma extension logs automatically)
     const [blogs, total] = await Promise.all([
       prisma.blog.findMany({
         where,
@@ -50,8 +49,6 @@ export async function GET(req: NextRequest) {
       }),
       prisma.blog.count({ where }),
     ]);
-    const dbDuration = Date.now() - dbStartTime;
-    logDbOperation("SELECT", "Blog", dbDuration);
 
     const result = createPaginationResult(blogs, total, pageNum, limitNum);
 
@@ -92,12 +89,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const dbStartTime = Date.now();
+    // Create blog (Prisma extension logs automatically)
     const blog = await prisma.blog.create({
       data: { title, excerpt, content, category, image: image || null },
     });
-    const dbDuration = Date.now() - dbStartTime;
-    logDbOperation("INSERT", "Blog", dbDuration);
 
     // Invalidate blog cache
     invalidateCache("blogs:*");

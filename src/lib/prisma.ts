@@ -1,7 +1,39 @@
 import { PrismaClient } from "@prisma/client";
+import { logDbOperation } from "./logger";
 
 const prismaClientSingleton = () => {
-  return new PrismaClient();
+  const client = new PrismaClient().$extends({
+    query: {
+      $allModels: {
+        async $allOperations({ operation, model, args, query }) {
+          const startTime = Date.now();
+
+          try {
+            const result = await query(args);
+            const duration = Date.now() - startTime;
+
+            // Log successful operations
+            logDbOperation(operation.toUpperCase(), model, duration);
+
+            return result;
+          } catch (error) {
+            const duration = Date.now() - startTime;
+
+            // Log failed operations
+            logDbOperation(
+              `${operation.toUpperCase()} (FAILED)`,
+              model,
+              duration,
+            );
+
+            throw error;
+          }
+        },
+      },
+    },
+  });
+
+  return client;
 };
 
 declare global {
