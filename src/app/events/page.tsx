@@ -1,5 +1,26 @@
 import { Events } from "@/components/Events";
 import { getEvents } from "@/actions/getEvents";
+import { type Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Events | AAC Foundation",
+  description:
+    "Join us in our mission to create positive change. Discover upcoming events, community gatherings, and opportunities to get involved with AAC Foundation.",
+  openGraph: {
+    title: "Events | AAC Foundation",
+    description:
+      "Discover upcoming events, community gatherings, and opportunities to get involved with AAC Foundation.",
+    images: ["/Logo.jpg"],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Events | AAC Foundation",
+    description:
+      "Discover upcoming events and opportunities to get involved with AAC Foundation.",
+    images: ["/Logo.jpg"],
+  },
+};
 
 export default async function EventPage() {
   const events = await getEvents();

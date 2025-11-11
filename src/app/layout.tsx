@@ -6,6 +6,10 @@ import { type Metadata } from "next";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ToastProvider } from "@/components/Toast";
+import {
+  OrganizationStructuredData,
+  WebsiteStructuredData,
+} from "@/components/StructuredData";
 
 export const metadata: Metadata = {
   title: "AAC Foundation | Making a Difference",
@@ -42,6 +46,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <head>
+        <OrganizationStructuredData />
+        <WebsiteStructuredData />
         <meta name="theme-color" content="#ea580c" />
         <meta name="msapplication-TileColor" content="#ea580c" />
         <meta name="msapplication-TileImage" content="/Logo.jpg" />

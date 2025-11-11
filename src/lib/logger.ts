@@ -3,6 +3,8 @@
  * Stores recent logs with timestamps and log levels
  */
 
+import alertManager from "./alerts";
+
 export type LogLevel =
   | "info"
   | "success"
@@ -200,6 +202,9 @@ export function logApiRequest(
     duration,
     status,
   });
+
+  // Check for performance alerts
+  alertManager.checkSlowApi(method, path, duration, status);
 }
 
 /**
@@ -216,6 +221,11 @@ export function logCacheOperation(
     delete: `Cache DELETE: ${key}`,
   };
   logger.cache(messages[operation], { operation, key });
+
+  // Check cache performance
+  if (operation === "hit" || operation === "miss") {
+    alertManager.checkCachePerformance(operation);
+  }
 }
 
 /**
@@ -231,4 +241,7 @@ export function logDbOperation(
     table,
     duration,
   });
+
+  // Check for slow queries
+  alertManager.checkSlowQuery(operation, table, duration);
 }

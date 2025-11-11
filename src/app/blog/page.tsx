@@ -2,6 +2,27 @@ import prisma from "@/lib/prisma";
 import { Calendar } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
+import { type Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Blog | AAC Foundation",
+  description:
+    "Read inspiring stories, updates, and insights from our charitable work. Stay informed about our latest initiatives, events, and the impact we're making in communities.",
+  openGraph: {
+    title: "Blog | AAC Foundation",
+    description:
+      "Read inspiring stories, updates, and insights from our charitable work. Stay informed about our latest initiatives and community impact.",
+    images: ["/Logo.jpg"],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Blog | AAC Foundation",
+    description:
+      "Read inspiring stories, updates, and insights from our charitable work and community impact.",
+    images: ["/Logo.jpg"],
+  },
+};
 
 export const dynamic = "force-dynamic";
 

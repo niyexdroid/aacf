@@ -1,0 +1,24 @@
+# Robots.txt for AACF (Abosedeaina Charity Foundation)
+# https://aacfoundation.org/robots.txt
+
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Disallow crawling of admin area
+Disallow: /admin/
+Disallow: /api/admin/
+
+# Disallow crawling of API routes (except public ones)
+Disallow: /api/auth/
+
+# Allow specific public API routes
+Allow: /api/blogs
+Allow: /api/events
+Allow: /api/gallery
+
+# Sitemap location
+Sitemap: https://aacfoundation.org/sitemap.xml
+
+# Crawl delay (optional - helps prevent server overload)
+Crawl-delay: 1

@@ -3,6 +3,11 @@ import prisma from "@/lib/prisma";
 import { Calendar, ArrowLeft, User } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import {
+  BlogPostStructuredData,
+  BreadcrumbStructuredData,
+} from "@/components/StructuredData";
+import { type Metadata } from "next";
 
 interface BlogPostProps {
   params: Promise<{
@@ -24,6 +29,39 @@ async function getBlogPost(id: string) {
   }
 }
 
+export async function generateMetadata({
+  params,
+}: BlogPostProps): Promise<Metadata> {
+  const { id } = await params;
+  const post = await getBlogPost(id);
+
+  if (!post) {
+    return {
+      title: "Post Not Found | AAC Foundation",
+    };
+  }
+
+  return {
+    title: `${post.title} | AAC Foundation`,
+    description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      images: [post.image || "/Logo.jpg"],
+      type: "article",
+      publishedTime: post.createdAt.toISOString(),
+      modifiedTime: post.updatedAt.toISOString(),
+      authors: ["AAC Foundation"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: [post.image || "/Logo.jpg"],
+    },
+  };
+}
+
 export default async function BlogPostPage({ params }: BlogPostProps) {
   const { id } = await params;
   const post = await getBlogPost(id);
@@ -34,6 +72,19 @@ export default async function BlogPostPage({ params }: BlogPostProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Structured Data */}
+      <BlogPostStructuredData post={post} />
+      <BreadcrumbStructuredData
+        items={[
+          { name: "Home", url: "https://aacfoundation.org" },
+          { name: "Blog", url: "https://aacfoundation.org/blog" },
+          {
+            name: post.title,
+            url: `https://aacfoundation.org/blog/${post.id}`,
+          },
+        ]}
+      />
+
       {/* Hero Section */}
       <section className="relative py-20 text-white">
         {/* Background Image */}

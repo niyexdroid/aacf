@@ -4,7 +4,9 @@ import nodemailer from "nodemailer";
 // Create Gmail SMTP transporter
 const createTransporter = () => {
   return nodemailer.createTransport({
-    service: "gmail",
+    host: process.env.EMAIL_SMTP_HOST || "smtp.gmail.com",
+    port: parseInt(process.env.EMAIL_SMTP_PORT || "587"),
+    secure: false, // true for 465, false for other ports
     auth: {
       user: process.env.EMAIL_SMTP_USER || process.env.EMAIL_FROM,
       pass: process.env.EMAIL_SMTP_PASS,
@@ -438,5 +440,243 @@ Message:
 ${data.message}
 
 This is an automated notification from your website contact form.
+  `;
+};
+
+// Performance Alert Email Interfaces
+export interface PerformanceAlertData {
+  alertType: string;
+  severity: "info" | "warning" | "critical";
+  message: string;
+  timestamp: string;
+  metadata?: Record<string, any>;
+}
+
+// Send critical performance alert email to admins
+export const sendPerformanceAlertEmail = async (
+  data: PerformanceAlertData,
+): Promise<void> => {
+  try {
+    // Only send emails for critical alerts to avoid spam
+    if (data.severity !== "critical") {
+      return;
+    }
+
+    console.log("Preparing critical performance alert email");
+
+    // Get admin email(s) from environment variable
+    const adminEmails =
+      process.env.ADMIN_ALERT_EMAIL ||
+      process.env.EMAIL_FROM ||
+      "abosedeainacharityfoundation@gmail.com";
+
+    // Send email using Gmail SMTP if credentials are available
+    if (process.env.EMAIL_SMTP_USER && process.env.EMAIL_SMTP_PASS) {
+      try {
+        const transporter = createTransporter();
+        const result = await transporter.sendMail({
+          from:
+            process.env.EMAIL_FROM || "abosedeainacharityfoundation@gmail.com",
+          to: adminEmails,
+          subject: `🚨 CRITICAL ALERT: ${data.alertType} - ${new Date(data.timestamp).toLocaleString()}`,
+          html: generatePerformanceAlertEmail(data),
+          text: generatePerformanceAlertEmailText(data),
+          priority: "high",
+        });
+        console.log(
+          "Critical alert email sent successfully:",
+          result.messageId,
+        );
+      } catch (emailError) {
+        console.error("Gmail SMTP alert email error:", emailError);
+      }
+    } else {
+      console.log(
+        "No Gmail SMTP credentials found, alert email sending skipped",
+      );
+    }
+  } catch (error) {
+    console.error("Error sending performance alert email:", error);
+    // Don't throw - we don't want email failures to break the app
+  }
+};
+
+// Generate HTML for performance alert email
+const generatePerformanceAlertEmail = (data: PerformanceAlertData): string => {
+  const severityColors = {
+    critical: "#dc2626",
+    warning: "#f59e0b",
+    info: "#3b82f6",
+  };
+
+  const severityEmojis = {
+    critical: "🔴",
+    warning: "🟡",
+    info: "🔵",
+  };
+
+  const color = severityColors[data.severity];
+  const emoji = severityEmojis[data.severity];
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Critical Performance Alert</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
+      
+      <!-- Header -->
+      <div style="text-align: center; margin-bottom: 30px; padding: 25px; background: ${color}; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h1 style="color: white; margin: 0; font-size: 28px;">${emoji} CRITICAL PERFORMANCE ALERT</h1>
+        <p style="color: white; margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Immediate attention required</p>
+      </div>
+      
+      <!-- Alert Details -->
+      <div style="background: white; padding: 30px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <h2 style="margin: 0 0 20px 0; color: ${color}; border-bottom: 2px solid ${color}; padding-bottom: 10px;">Alert Details</h2>
+        
+        <div style="margin-bottom: 15px;">
+          <strong style="color: #4b5563;">Alert Type:</strong>
+          <span style="display: inline-block; margin-left: 10px; padding: 4px 12px; background: ${color}; color: white; border-radius: 4px; font-size: 14px;">${data.alertType.toUpperCase()}</span>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+          <strong style="color: #4b5563;">Severity:</strong>
+          <span style="display: inline-block; margin-left: 10px; padding: 4px 12px; background: ${color}; color: white; border-radius: 4px; font-size: 14px;">${emoji} ${data.severity.toUpperCase()}</span>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+          <strong style="color: #4b5563;">Timestamp:</strong>
+          <span style="margin-left: 10px; color: #6b7280;">${new Date(data.timestamp).toLocaleString()}</span>
+        </div>
+        
+        <div style="background: #fef2f2; border-left: 4px solid ${color}; padding: 20px; border-radius: 5px; margin: 20px 0;">
+          <h3 style="margin: 0 0 10px 0; color: ${color}; font-size: 16px;">⚠️ Alert Message</h3>
+          <p style="margin: 0; color: #374151; font-size: 15px; font-weight: 500;">${data.message}</p>
+        </div>
+        
+        ${
+          data.metadata && Object.keys(data.metadata).length > 0
+            ? `
+        <div style="margin-top: 25px;">
+          <h3 style="margin: 0 0 15px 0; color: #374151; font-size: 16px;">📊 Additional Details</h3>
+          <table style="width: 100%; border-collapse: collapse; background: #f9fafb; border-radius: 8px; overflow: hidden;">
+            ${Object.entries(data.metadata)
+              .map(
+                ([key, value]) => `
+              <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 12px; font-weight: 600; color: #4b5563; width: 40%;">${key}</td>
+                <td style="padding: 12px; color: #6b7280;">${JSON.stringify(value)}</td>
+              </tr>
+            `,
+              )
+              .join("")}
+          </table>
+        </div>
+        `
+            : ""
+        }
+      </div>
+      
+      <!-- Action Items -->
+      <div style="background: #eff6ff; padding: 25px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #3b82f6;">
+        <h3 style="margin: 0 0 15px 0; color: #1e40af; font-size: 18px;">🎯 Recommended Actions</h3>
+        <ul style="margin: 0; padding-left: 20px; color: #1e40af;">
+          <li style="margin-bottom: 8px;">Review the performance dashboard at <strong>/admin/performance</strong></li>
+          <li style="margin-bottom: 8px;">Check recent logs for more context</li>
+          <li style="margin-bottom: 8px;">Investigate the root cause of the performance issue</li>
+          <li style="margin-bottom: 8px;">Take corrective action to resolve the issue</li>
+          <li style="margin-bottom: 8px;">Consider adjusting alert thresholds if needed</li>
+        </ul>
+      </div>
+      
+      <!-- Quick Links -->
+      <div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <h3 style="margin: 0 0 15px 0; color: #374151;">Quick Actions</h3>
+        <div style="display: inline-block; margin: 0 10px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/admin/performance" 
+             style="display: inline-block; padding: 12px 24px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 5px;">
+            📊 View Dashboard
+          </a>
+        </div>
+        <div style="display: inline-block; margin: 0 10px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/admin/performance#logs" 
+             style="display: inline-block; padding: 12px 24px; background: #059669; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 5px;">
+            📝 Check Logs
+          </a>
+        </div>
+      </div>
+      
+      <!-- Footer -->
+      <div style="text-align: center; margin-top: 30px; padding: 20px; border-top: 2px solid #e5e7eb;">
+        <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 14px;">
+          This is an automated alert from your application performance monitoring system.
+        </p>
+        <p style="margin: 0; color: #9ca3af; font-size: 12px;">
+          AACF Performance Monitoring System<br>
+          ${new Date().toLocaleDateString()}
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+};
+
+// Generate plain text for performance alert email
+const generatePerformanceAlertEmailText = (
+  data: PerformanceAlertData,
+): string => {
+  const severityEmojis = {
+    critical: "🔴",
+    warning: "🟡",
+    info: "🔵",
+  };
+
+  const emoji = severityEmojis[data.severity];
+
+  return `
+${emoji} CRITICAL PERFORMANCE ALERT ${emoji}
+
+ALERT DETAILS
+=============
+Alert Type: ${data.alertType.toUpperCase()}
+Severity: ${emoji} ${data.severity.toUpperCase()}
+Timestamp: ${new Date(data.timestamp).toLocaleString()}
+
+ALERT MESSAGE
+=============
+${data.message}
+
+${
+  data.metadata && Object.keys(data.metadata).length > 0
+    ? `
+ADDITIONAL DETAILS
+==================
+${Object.entries(data.metadata)
+  .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
+  .join("\n")}
+`
+    : ""
+}
+
+RECOMMENDED ACTIONS
+===================
+- Review the performance dashboard at /admin/performance
+- Check recent logs for more context
+- Investigate the root cause of the performance issue
+- Take corrective action to resolve the issue
+- Consider adjusting alert thresholds if needed
+
+QUICK LINKS
+===========
+Dashboard: ${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/admin/performance
+Logs: ${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/admin/performance#logs
+
+---
+This is an automated alert from your application performance monitoring system.
+AACF Performance Monitoring System
+${new Date().toLocaleDateString()}
   `;
 };

@@ -10,6 +10,9 @@ import {
   Terminal,
   Trash2,
   Filter,
+  AlertTriangle,
+  Bell,
+  X,
 } from "lucide-react";
 
 interface PerformanceMetrics {
@@ -46,10 +49,35 @@ interface LogsResponse {
   };
 }
 
+interface Alert {
+  id: string;
+  type: string;
+  severity: "info" | "warning" | "critical";
+  message: string;
+  timestamp: string;
+  metadata?: Record<string, any>;
+  dismissed?: boolean;
+}
+
+interface AlertsResponse {
+  alerts: Alert[];
+  stats: {
+    total: number;
+    active: number;
+    bySeverity: {
+      info: number;
+      warning: number;
+      critical: number;
+    };
+  };
+}
+
 export default function PerformanceMonitor() {
   const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [logStats, setLogStats] = useState<any>(null);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [alertStats, setAlertStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [logFilter, setLogFilter] = useState<string>("all");
@@ -84,6 +112,36 @@ export default function PerformanceMonitor() {
     }
   };
 
+  const fetchAlerts = async () => {
+    try {
+      const response = await fetch("/api/admin/alerts");
+      const data: AlertsResponse = await response.json();
+      setAlerts(data.alerts);
+      setAlertStats(data.stats);
+    } catch (error) {
+      console.error("Failed to fetch alerts:", error);
+    }
+  };
+
+  const dismissAlert = async (id: string) => {
+    try {
+      await fetch(`/api/admin/alerts?id=${id}`, { method: "DELETE" });
+      fetchAlerts();
+    } catch (error) {
+      console.error("Failed to dismiss alert:", error);
+    }
+  };
+
+  const dismissAllAlerts = async () => {
+    if (!confirm("Dismiss all alerts?")) return;
+    try {
+      await fetch("/api/admin/alerts", { method: "DELETE" });
+      fetchAlerts();
+    } catch (error) {
+      console.error("Failed to dismiss all alerts:", error);
+    }
+  };
+
   const clearLogs = async () => {
     if (!confirm("Clear all logs?")) return;
     try {
@@ -97,12 +155,15 @@ export default function PerformanceMonitor() {
   useEffect(() => {
     fetchMetrics();
     fetchLogs();
+    fetchAlerts();
     // Auto-refresh every 5 seconds
     const metricsInterval = setInterval(fetchMetrics, 30000);
     const logsInterval = setInterval(fetchLogs, 5000);
+    const alertsInterval = setInterval(fetchAlerts, 5000);
     return () => {
       clearInterval(metricsInterval);
       clearInterval(logsInterval);
+      clearInterval(alertsInterval);
     };
   }, [logFilter]);
 
@@ -149,6 +210,79 @@ export default function PerformanceMonitor() {
             Refresh
           </button>
         </div>
+
+        {/* Performance Alerts */}
+        {alerts.length > 0 && (
+          <div className="mb-6 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Bell className="h-5 w-5 text-orange-600" />
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Active Alerts ({alertStats?.active || 0})
+                </h2>
+              </div>
+              <button
+                onClick={dismissAllAlerts}
+                className="text-sm text-gray-600 hover:text-gray-900"
+              >
+                Dismiss All
+              </button>
+            </div>
+
+            {alerts.map((alert) => (
+              <div
+                key={alert.id}
+                className={`flex items-start gap-3 rounded-lg border-l-4 p-4 shadow-sm ${
+                  alert.severity === "critical"
+                    ? "border-red-500 bg-red-50"
+                    : alert.severity === "warning"
+                      ? "border-yellow-500 bg-yellow-50"
+                      : "border-blue-500 bg-blue-50"
+                }`}
+              >
+                <AlertTriangle
+                  className={`mt-0.5 h-5 w-5 flex-shrink-0 ${
+                    alert.severity === "critical"
+                      ? "text-red-600"
+                      : alert.severity === "warning"
+                        ? "text-yellow-600"
+                        : "text-blue-600"
+                  }`}
+                />
+                <div className="flex-1">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        {alert.message}
+                      </p>
+                      <p className="mt-1 text-sm text-gray-600">
+                        {new Date(alert.timestamp).toLocaleString()}
+                      </p>
+                      {alert.metadata && (
+                        <div className="mt-2 text-xs text-gray-500">
+                          {Object.entries(alert.metadata).map(
+                            ([key, value]) => (
+                              <span key={key} className="mr-3">
+                                <strong>{key}:</strong> {JSON.stringify(value)}
+                              </span>
+                            ),
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => dismissAlert(alert.id)}
+                      className="text-gray-400 hover:text-gray-600"
+                      title="Dismiss alert"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Metrics Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
